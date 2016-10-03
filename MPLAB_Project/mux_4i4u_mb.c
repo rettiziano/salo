@@ -1,3 +1,5 @@
+#case 
+
 #include <16F628A.h>
 #include "mux_4i4u_mb.h"
 #include "..\modbus_library\spif.c"
@@ -10,8 +12,31 @@ volatile unsigned int8 flag_1ms = 0;	// attivo nell'interrupt
 #define LOCK 	1
 #define	UNLOCK 	0
 
-unsigned int8 lockGame = UNLOCK;				// blocca il gioco
+#define	RELE0	BIT0
+#define	RELE1	BIT1
+#define	RELE2	BIT2
+#define	RELE3	BIT3
+
+#define	RELE_0_ON	outputStatus |= RELE0
+#define	RELE_0_OFF	outputStatus &= ~RELE0 
+
+#define	RELE_1_ON	outputStatus |= RELE1
+#define	RELE_1_OFF	outputStatus &= ~RELE1
+
+#define	RELE_3_ON	outputStatus |= RELE3
+#define	RELE_3_TOGGLE	outputStatus ^= RELE3
+
+#define	TIME_HEARTBEAT	250
+
+unsigned int8 lockGame = UNLOCK;		// libera il gioco
 unsigned int8 buttonStatus = 0;
+
+volatile unsigned int16 timeoutLampeggi[2] = {0,0};
+volatile unsigned int16 timeoutSirena = 0;		// tempo attivazione sirena		
+volatile unsigned int16 heartBeatTimer = 0;
+
+#define MAX_TIME_SIRENA_ATTIVA 3		// in secondi
+#define MAX_LAMPEGGI			2000
 	
 #define MAX_BUTTONS	4					// tasti attivi
 #define MAX_DEBOUNCE 25					// debounce in ms
@@ -27,6 +52,11 @@ struct _button_ button[MAX_BUTTONS];	// struttura tasti
 void RandomWins(void);
 void Player1wins(void);
 void Player2wins(void);
+void sirenaOn(void);
+void sirenaOff(void);
+void lampeggiante(unsigned int8 vincitore);
+void HeartBeat(unsigned int8 status);
+void LockGame(void);
 /****************************************************************************************/
 
 void coilOutput(void)		// reimposta le uscite digitali
@@ -144,20 +174,73 @@ void coilReset(void)		// resetta le uscite digitali
 }
 /******************************************************************************************/
 
-#int_rda                            	// salta cada vez que recibe los datos disponibles de la rs232
-void serial_isr()
-{//////////////////////// serial //////////////////////////////
-           					// espera mientras que stop cambie
-}//////////////////////// serial //////////////////////////////
-
 #INT_TIMER0
 void timer0_isr()
 { // scocca ad 1ms
 	set_timer0(28);
 
 	flag_1ms = 1;
+	
+	if (timeoutSirena)
+	{
+		timeoutSirena--;
+		if (timeoutSirena == 0) sirenaOff();
+	}
+	
+	if(timeoutLampeggi[0])
+	{
+		timeoutLampeggi[0]--;
+		
+		switch (timeoutLampeggi[0])
+		{
+			case 0:
+			case 500:
+			case 1000:
+			case 1500:
+				RELE_0_ON;
+			break;
+			
+			case 250:
+			case 750:
+			case 1250:
+			case 1750:
+				RELE_0_OFF;
+			break;
+		}
+	}
+	
+	if(timeoutLampeggi[1])
+	{
+		timeoutLampeggi[1]--;
+		
+		switch (timeoutLampeggi[1])
+		{
+			case 0:
+			case 500:
+			case 1000:
+			case 1500:
+				RELE_1_ON;
+			break;
+			
+			case 250:
+			case 750:
+			case 1250:
+			case 1750:
+				RELE_1_OFF;
+			break;
+		}
+	}
+	
+	if(heartBeatTimer)
+	{
+		heartBeatTimer--;
+		if (heartBeatTimer == 0)
+		{
+			heartBeatTimer = TIME_HEARTBEAT;
+			RELE_3_TOGGLE;
+		}
+	}
 }
-
 
 
 unsigned char readAddr(void)
@@ -204,6 +287,10 @@ void main()
 		button[i].set = 0;
 	}
 	
+	lockGame = UNLOCK;		// blocca il gioco
+	
+	HeartBeat(1);
+	
 	for(;;)
 	{// main loop
 		restart_wdt();
@@ -221,7 +308,7 @@ void main()
 			if (lockGame == UNLOCK)
 			{	// chi vincera?
   				RandomWins();
-  				lockGame=LOCK; 		// fine dei giochi
+  				LockGame(); 		// fine dei giochi
 			}
 		}
 
@@ -230,7 +317,7 @@ void main()
 			if (lockGame == UNLOCK)
 			{	
   				Player1wins();
-  				lockGame=LOCK; 		// fine dei giochi
+  				LockGame(); 		// fine dei giochi
 			}		
 		}
 		
@@ -239,7 +326,7 @@ void main()
 			if (lockGame == UNLOCK)
 			{	
   				Player2wins();
-  				lockGame=LOCK; 		// fine dei giochi
+  				LockGame(); 		// fine dei giochi
 			}		
 		}
 
@@ -252,6 +339,10 @@ void main()
 				button[0].set = 0;
 				button[1].set = 0;
 				button[2].set = 0;
+				RELE_0_OFF;
+				RELE_1_OFF;
+				sirenaOff();
+				HeartBeat(1);
 			}
 		}
 	}// main loop
@@ -280,9 +371,69 @@ void RandomWins(void)
 void Player1wins(void)
 {
 	printf("[Player1wins]\n");
+	sirenaOn(); 	// tira il rele 3 per 2 secondi
+	lampeggiante(1);
 }
 	
 void Player2wins(void)
 {
 	printf("[Player2wins]\n");
+	sirenaOn(); 	// tira il rele 3 per 2 secondi
+	lampeggiante(2);
+}
+
+
+void sirenaOn(void)
+{
+	outputStatus |= RELE2; // tira il rele 3 e fa partire il timeout di disattivazione
+	timeoutSirena = 1000 * MAX_TIME_SIRENA_ATTIVA;
+	
+}
+
+void sirenaOff(void)
+{
+	outputStatus &= ~RELE2; // molla il rele 3
+}
+
+void lampeggiante(unsigned int8 vincitore)
+{
+	switch(vincitore)
+	{
+		case 1:
+		{
+			outputStatus |= RELE0; // tira il rele 0 e fa partire il timeout di disattivazione
+			timeoutLampeggi[0] = MAX_LAMPEGGI;
+		}
+		break;
+		
+		case 2:
+		{
+			outputStatus |= RELE1; // tira il rele 1 e fa partire il timeout di disattivazione
+			timeoutLampeggi[1] = MAX_LAMPEGGI;
+		}
+		break;
+		
+		default:
+		break;
+	}
+}
+
+void HeartBeat(unsigned int8 status)
+{
+	if(status == 0)
+	{
+		heartBeatTimer = 0;
+	}
+	else
+	{
+		heartBeatTimer = TIME_HEARTBEAT;
+	}
+	
+	RELE_3_ON;
+}
+
+void LockGame(void)
+{
+	lockGame=LOCK; 		// fine dei giochi
+	HeartBeat(0);
 }
