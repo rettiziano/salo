@@ -339,8 +339,14 @@ void main()
 
 		if(button[2].set != 0)
 		{
+			sirenaOn();
+			button[2].set = 0;
+		}
+
+		if(button[3].set != 0)
+		{
 			// riarmare il tutto
-			if ((buttonStatus & 0x07) == 0)
+			if ((buttonStatus & 0x0B) == 0)
 			{	// tutti i pulsanti sono rilasciati
 				ResetGame();
 			}
@@ -452,7 +458,7 @@ void ResetGame(void)
 	timeoutLampeggi[1] = 0;
 	button[0].set = 0;
 	button[1].set = 0;
-	button[2].set = 0;
+	button[3].set = 0;
 	RELE_0_OFF;
 	RELE_1_OFF;
 	sirenaOff();
