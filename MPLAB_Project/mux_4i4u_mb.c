@@ -5,8 +5,31 @@
 /****************************************************************************************/
 unsigned int16 reg[2];		
 
+volatile unsigned int8 flag_1ms = 0;	// attivo nell'interrupt
+
+#define LOCK 	1
+#define	UNLOCK 	0
+
+unsigned int8 lockGame = UNLOCK;				// blocca il gioco
+unsigned int8 buttonStatus = 0;
+	
 #define DO_ADDR	0
 #define DI_ADDR 1     					     				    					 				     				  					     		     					   
+
+#define MAX_BUTTONS	4					// tasti attivi
+#define MAX_DEBOUNCE 25					// debounce in ms
+
+struct _button_							
+{		
+	unsigned int8 debounce;
+	unsigned int8 set;
+};
+
+struct _button_ button[MAX_BUTTONS];	// struttura tasti
+
+void RandomWins(void);
+void Player1wins(void);
+void Player2wins(void);
 /****************************************************************************************/
 
 void coilOutput(void)		// reimposta le uscite digitali
@@ -21,48 +44,92 @@ void coilOutput(void)		// reimposta le uscite digitali
 void read_DI(void)
 {
 	static bit column_bit = 0;	
-	static unsigned int8 tempButton;
-	unsigned char channel;
-	unsigned char readInput;	
-	static unsigned char debounce[4];
 
 	column_bit++;
 	if(column_bit)
 	{// gestione delle colonne della matrice 2 x 2, prima colonna 
-		if(input(DI0_2)) bit_set(tempButton,0); else bit_clear(tempButton,0);
-		if(input(DI1_3)) bit_set(tempButton,1); else bit_clear(tempButton,1);	
+		if(input(DI0_2)) 
+		{		
+			if(button[0].debounce)
+			{
+				button[0].debounce--;
+
+				if(button[0].debounce == 0)
+				{
+					button[0].set = 1;
+					bit_set(buttonStatus,0);		// tasto 0 premuto
+				}
+			}
+		} 
+		else 
+		{		
+			bit_clear(buttonStatus,0);	// tasto 0 rilastiato
+			button[0].debounce = MAX_DEBOUNCE;
+		}
+
+		if(input(DI1_3)) 
+		{
+			if(button[1].debounce)
+			{
+				button[1].debounce--;
+
+				if(button[1].debounce == 0)
+				{
+					button[1].set = 1;
+					bit_set(buttonStatus,1);		// tasto 1 premuto
+				}
+			}
+ 		}
+		else 
+		{
+			bit_clear(buttonStatus,1);	// tasto 1 rialsciato
+			button[1].debounce = MAX_DEBOUNCE;
+		}
+
 		output_low(COL);
 	}// gestione delle colonne della matrice 2 x 2, prima colonna
 	else
 	{// gestione delle colonne della matrice 2 x 2, seconda colonna
-		if(input(DI0_2)) bit_set(tempButton,2); else bit_clear(tempButton,2);
-		if(input(DI1_3)) bit_set(tempButton,3); else bit_clear(tempButton,3);
+		if(input(DI0_2)) 
+		{
+			if(button[2].debounce)
+			{
+				button[2].debounce--;
+
+				if(button[2].debounce == 0)
+				{
+					button[2].set = 1;
+					bit_set(buttonStatus,2); 		// tasto 2 premuto
+				}
+			}
+		}
+		else 
+		{
+			bit_clear(buttonStatus,2);
+			button[2].debounce = MAX_DEBOUNCE;
+		}		
+
+		if(input(DI1_3)) 
+		{
+			if(button[3].debounce)
+			{
+				button[3].debounce--;
+
+				if(button[3].debounce == 0)
+				{
+					button[3].set = 1;
+					bit_set(buttonStatus,3); 		// tasto 3 premuto
+				}
+			}
+		}
+		else 
+		{
+			bit_clear(buttonStatus,3);
+			button[3].debounce = MAX_DEBOUNCE;
+		}	
+
 		output_high(COL);
 	}// gestione delle colonne della matrice 2 x 2, seconda colonna
-
-
-	for (channel = 0; channel != 4; channel++)
-	{// per quanti sono gli ingressi fai
-		readInput = ((tempButton & (BIT0<<channel)) != 0);
-		
-		if (readInput)
-		{// input attivo, ma prima come stava?
-			if (debounce[channel] < 4)
-			{// antirimbalzo in corso
-				debounce[channel]++;
-				if (debounce[channel] == 4)
-				{// debounce time raggiunto
-					reg[DO_ADDR] ^= (BIT0 << channel);
-				}// debounce time raggiunto
-			}// antirimbalzo in corso
-		}// input attivo, ma prima come stava?
-		else
-		{// input disattivo, riarma debounce
-			debounce[channel] = 0;
-		}// input disattivo, riarma debounce
-	}// per quanti sono gli ingressi fai
-
-	reg[DI_ADDR] = reg[DO_ADDR];
 }
 
 
@@ -90,6 +157,8 @@ void serial_isr()
 void timer0_isr()
 { // scocca ad 1ms
 	set_timer0(28);
+
+	flag_1ms = 1;
 }
 
 
@@ -112,6 +181,8 @@ unsigned char readAddr(void)
 
 void main()
 {//////////////////////////////  main ////////////////////	
+	unsigned int8 i=0;
+	
 	#use fast_io(A)
 	#use fast_io(B)
 	
@@ -132,15 +203,92 @@ void main()
 	reg[DI_ADDR] = 0;
 
 	coilReset();
+
+	for(i=0;i<MAX_BUTTONS;i++)
+	{	
+		button[i].debounce = MAX_DEBOUNCE;
+		button[i].set = 0;
+	}
 	
 	for(;;)
 	{// main loop
 		restart_wdt();
-		read_DI();
-		coilOutput();
 
-	// value=get_timer0()   
+		if(flag_1ms)
+		{
+			read_DI();		// leggo gli incgressi
+			coilOutput();	// scrivo le uscite
+			flag_1ms = 0;
+		}
+		
+		// gestisco la logica del gioco
+		if ((button[0].set != 0) && (button[1].set != 0))
+		{	// hanno premuto contemporaneamente. 
+			if (lockGame == UNLOCK)
+			{	// chi vincera?
+  				RandomWins();
+  				lockGame=LOCK; 		// fine dei giochi
+			}
+		}
 
+		if ((button[0].set != 0) && button[1].set == 0)
+		{ // ha vinto il player 1
+			if (lockGame == UNLOCK)
+			{	
+  				Player1wins();
+  				lockGame=LOCK; 		// fine dei giochi
+			}		
+		}
+		
+		if ((button[1].set != 0) && button[0].set == 0)
+		{ // ha vinto il player 2
+			if (lockGame == UNLOCK)
+			{	
+  				Player2wins();
+  				lockGame=LOCK; 		// fine dei giochi
+			}		
+		}
+
+		if(button[2].set != 0)
+		{
+			// riarmare il tutto
+			if ((buttonStatus & 0x07) == 0)
+			{	// tutti i pulsanti sono rilasciati
+				lockGame=UNLOCK;
+				button[0].set = 0;
+				button[1].set = 0;
+				button[2].set = 0;
+			}
+		}
 	}// main loop
 }//////////////////////////////  main ////////////////////	
 
+
+
+void RandomWins(void)
+{
+	unsigned int8 value;
+	printf("[RandomWins]\n");
+
+	value=get_timer0();
+	
+	if(value & BIT0)
+	{
+		Player1wins();
+	}
+	else
+	{
+		Player2wins();
+	}
+}
+	
+	
+void Player1wins(void)
+{
+	printf("[Player1wins]\n");
+}
+	
+void Player2wins(void)
+{
+	printf("[Player2wins]\n");
+}
