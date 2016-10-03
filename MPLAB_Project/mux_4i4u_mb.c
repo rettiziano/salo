@@ -3,7 +3,7 @@
 #include "..\modbus_library\spif.c"
 
 /****************************************************************************************/
-unsigned int16 reg[2];		
+unsigned int8 outputStatus = 0;		
 
 volatile unsigned int8 flag_1ms = 0;	// attivo nell'interrupt
 
@@ -13,9 +13,6 @@ volatile unsigned int8 flag_1ms = 0;	// attivo nell'interrupt
 unsigned int8 lockGame = UNLOCK;				// blocca il gioco
 unsigned int8 buttonStatus = 0;
 	
-#define DO_ADDR	0
-#define DI_ADDR 1     					     				    					 				     				  					     		     					   
-
 #define MAX_BUTTONS	4					// tasti attivi
 #define MAX_DEBOUNCE 25					// debounce in ms
 
@@ -34,10 +31,10 @@ void Player2wins(void);
 
 void coilOutput(void)		// reimposta le uscite digitali
 {
-	output_bit(DO0,bit_test(reg[DO_ADDR],0));
-	output_bit(DO1,bit_test(reg[DO_ADDR],1));
-	output_bit(DO2,bit_test(reg[DO_ADDR],2));
-	output_bit(DO3,bit_test(reg[DO_ADDR],3));
+	output_bit(DO0,bit_test(outputStatus,0));
+	output_bit(DO1,bit_test(outputStatus,1));
+	output_bit(DO2,bit_test(outputStatus,2));
+	output_bit(DO3,bit_test(outputStatus,3));
 }
 /*****************************************************************************************/
 
@@ -143,7 +140,7 @@ void coilReset(void)		// resetta le uscite digitali
 	output_bit(DO2,0);
 	output_bit(DO3,0);
 
-	reg[DO_ADDR] = 0;
+	outputStatus = 0;
 }
 /******************************************************************************************/
 
@@ -199,9 +196,6 @@ void main()
 	enable_interrupts(GLOBAL);
 	enable_interrupts(INT_TIMER0);
 	
-	reg[DO_ADDR] = 0;
-	reg[DI_ADDR] = 0;
-
 	coilReset();
 
 	for(i=0;i<MAX_BUTTONS;i++)
