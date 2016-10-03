@@ -28,21 +28,25 @@ file_000=.
 file_001=.
 file_002=.
 file_003=.
+file_004=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
 file_002=no
 file_003=no
+file_004=no
 [OTHER_FILES]
 file_000=no
 file_001=no
 file_002=yes
 file_003=yes
+file_004=yes
 [FILE_INFO]
 file_000=mux_4i4u_mb.c
 file_001=mux_4i4u_mb.h
 file_002=mux_4i4u_mb.SYM
 file_003=mux_4i4u_mb.TRE
+file_004=C:\Program Files (x86)\PICC\Devices\16F628A.h
 [SUITE_INFO]
 suite_guid={BA86BF99-4C07-4CE2-A9E7-C2A337910996}
 suite_state=

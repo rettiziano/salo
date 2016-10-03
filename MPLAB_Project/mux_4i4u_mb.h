@@ -15,7 +15,7 @@
 
 /************************************************************************************/
 
-#define HW_ADDR_OFFSET		0x38	// see ..\mmaster\modbus\Peripheral_Hw_Addr.xls
+#define HW_ADDR_OFFSET		0x00	// see ..\mmaster\modbus\Peripheral_Hw_Addr.xls
 
 #define FW_RELEASE_ADDR		0	// indirizzo in reg[] del Tag Firmware Release 				
 #define UART_ADDR         7	// indirizzo in reg[] del registro di configurazione della UART
@@ -81,8 +81,7 @@
 #define FOSC 14745600
 
 #use delay(clock=FOSC,restart_wdt)
-
-#use rs232(parity = e,xmit=PIN_B2,rcv=PIN_B1,bits=8,enable=PIN_B3,errors)
+// #use rs232(parity = e,xmit=PIN_B2,rcv=PIN_B1,bits=8,enable=PIN_B3,errors)
 
 /********************************************************************************/
 
@@ -156,8 +155,6 @@ l'invio della relativa risposta.
 #define T_TX_HIGH				65535 - 1750.0*(FOSC/4.0/1000000.0)
 
 /***************************************************************************************/
-
-
 #define DO0 					PIN_A0
 #define DO1						PIN_A1
 #define DO2 					PIN_A2
@@ -168,9 +165,9 @@ l'invio della relativa risposta.
 #define DI0_2 					PIN_B6
 #define DI1_3	 				PIN_B7
 
-#define FIRST_PIN    	PIN_B5
-#define SECOND_PIN   	PIN_B4	
-#define THIRD_PIN  		PIN_B0	
+#define ADDRESS_PIN_1	    	PIN_B5
+#define ADDRESS_PIN_2		   	PIN_B4	
+#define ADDRESS_PIN_3	  		PIN_B0	
 
 /***************************************************************************************/
 

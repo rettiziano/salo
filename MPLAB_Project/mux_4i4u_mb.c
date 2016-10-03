@@ -89,14 +89,23 @@ void serial_isr()
            					// espera mientras que stop cambie
 }//////////////////////// serial //////////////////////////////
 
+#INT_TIMER0
+void timer0_isr()
+{ // scocca ad 1ms
+	set_timer0(28);
+}
+
+
+
 unsigned char readAddr(void)
 {
-	unsigned char tmp = 0;	
-	tmp |= input(FIRST_PIN)  << 2;   // Mas Sig. Bit
-	tmp |= input(SECOND_PIN) << 1;   //
-	tmp |= input(THIRD_PIN)  << 0;   // Less Sig. Bit
-	tmp += HW_ADDR_OFFSET; //0x18
-	return tmp;	// 0 0 0 0x18 = 24
+	unsigned char hardwareAddress = 0;	
+	hardwareAddress |= input(ADDRESS_PIN_1)  << 2;   // Mas Sig. Bit
+	hardwareAddress |= input(ADDRESS_PIN_2) << 1;   //
+	hardwareAddress |= input(ADDRESS_PIN_3)  << 0;   // Less Sig. Bit
+	hardwareAddress += HW_ADDR_OFFSET; //0x18
+
+	return hardwareAddress;	// 0 0 0 0x18 = 24
 }
 
 
@@ -109,7 +118,7 @@ void main()
 	#use fast_io(A)
 	#use fast_io(B)
 	
-	setup_timer_0(RTCC_INTERNAL);
+	setup_timer_0(T0_DIV_16);
 	setup_wdt(WDT_2304MS);		
 	setup_timer_1(T1_INTERNAL); 
 	setup_ccp1(CCP_OFF);
@@ -117,21 +126,24 @@ void main()
 	
 	set_tris_a(0b11100000);
 	set_tris_b(0b11110111);
+	set_timer0(28);
 	
 	enable_interrupts(GLOBAL);
-	disable_interrupts(INT_TIMER1);
+	enable_interrupts(INT_TIMER0);
 	
-	set_timer1(T_35_DEFAULT);
-
 	reg[DO_ADDR] = 0;
 	reg[DI_ADDR] = 0;
+
+	coilReset();
 	
 	for(;;)
 	{// main loop
+		restart_wdt();
+		read_DI();
+		coilOutput();
 
-			read_DI();
-			coilOutput();
-			
+	// value=get_timer0()   
+
 	}// main loop
 }//////////////////////////////  main ////////////////////	
 
