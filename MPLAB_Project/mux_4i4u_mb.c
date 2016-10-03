@@ -43,7 +43,7 @@ volatile unsigned int16 heartBeatTimer = 0;
 #define MAX_LAMPEGGI			2000
 	
 #define MAX_BUTTONS	4					// tasti attivi
-#define MAX_DEBOUNCE 25					// debounce in ms
+#define MAX_DEBOUNCE 40					// debounce in ms
 
 struct _button_							
 {		
@@ -61,6 +61,7 @@ void sirenaOff(void);
 void lampeggiante(unsigned int8 vincitore);
 void HeartBeat(unsigned int8 status);
 void LockGame(void);
+void ResetGame(void);
 /****************************************************************************************/
 
 void coilOutput(void)		// reimposta le uscite digitali
@@ -341,14 +342,7 @@ void main()
 			// riarmare il tutto
 			if ((buttonStatus & 0x07) == 0)
 			{	// tutti i pulsanti sono rilasciati
-				lockGame=UNLOCK;
-				button[0].set = 0;
-				button[1].set = 0;
-				button[2].set = 0;
-				RELE_0_OFF;
-				RELE_1_OFF;
-				sirenaOff();
-				HeartBeat(1);
+				ResetGame();
 			}
 		}
 	}// main loop
@@ -419,6 +413,11 @@ void lampeggiante(unsigned int8 vincitore)
 		}
 		break;
 		
+		case 0:
+		{
+			
+		}
+		break;	
 		default:
 		break;
 	}
@@ -445,4 +444,19 @@ void LockGame(void)
 {
 	lockGame=LOCK; 		// fine dei giochi
 	HeartBeat(0);
+}
+
+void ResetGame(void)
+{
+	timeoutLampeggi[0] = 0;
+	timeoutLampeggi[1] = 0;
+	button[0].set = 0;
+	button[1].set = 0;
+	button[2].set = 0;
+	RELE_0_OFF;
+	RELE_1_OFF;
+	sirenaOff();
+	HeartBeat(1);
+	lockGame=UNLOCK;
+
 }
