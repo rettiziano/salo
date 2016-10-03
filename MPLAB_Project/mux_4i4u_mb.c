@@ -3,9 +3,6 @@
 #include "..\modbus_library\spif.c"
 
 /****************************************************************************************/
-unsigned char counter;    	// contatore utilizzato nella routine di interrupt
-unsigned char dev_address;
-unsigned char prima, adesso;
 unsigned int16 reg[2];		
 
 #define DO_ADDR	0
