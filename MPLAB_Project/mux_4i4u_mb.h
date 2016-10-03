@@ -165,9 +165,8 @@ l'invio della relativa risposta.
 
 #define COL 					PIN_A4
 
-#define DI0_2 				PIN_B6
+#define DI0_2 					PIN_B6
 #define DI1_3	 				PIN_B7
-
 
 #define FIRST_PIN    	PIN_B5
 #define SECOND_PIN   	PIN_B4	
