@@ -28,7 +28,7 @@
 #define FOSC 14745600
 
 #use delay(clock=FOSC,restart_wdt)
-#use rs232(baud=115200, parity = N,xmit=PIN_B2,rcv=PIN_B1,bits=8)
+// #use rs232(baud=115200, parity = N,xmit=PIN_B2,rcv=PIN_B1,bits=8)
 
 /************************************************************************************/
 

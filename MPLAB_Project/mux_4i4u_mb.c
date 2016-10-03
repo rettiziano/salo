@@ -24,7 +24,11 @@ volatile unsigned int8 flag_1ms = 0;	// attivo nell'interrupt
 #define	RELE_1_OFF	outputStatus &= ~RELE1
 
 #define	RELE_3_ON	outputStatus |= RELE3
-#define	RELE_3_TOGGLE	outputStatus ^= RELE3
+#define	RELE_3_OFF	outputStatus &= ~RELE3
+// #define	RELE_3_TOGGLE	outputStatus ^= RELE3
+
+// #define LED_HEARTBEAT_ON output_bit(PIN_B1,0)
+// #define LED_HEARTBEAT_TOGGLE output_toggle(PIN_B1)
 
 #define	TIME_HEARTBEAT	250
 
@@ -35,7 +39,7 @@ volatile unsigned int16 timeoutLampeggi[2] = {0,0};
 volatile unsigned int16 timeoutSirena = 0;		// tempo attivazione sirena		
 volatile unsigned int16 heartBeatTimer = 0;
 
-#define MAX_TIME_SIRENA_ATTIVA 3		// in secondi
+#define MAX_TIME_SIRENA_ATTIVA 	1		// in secondi
 #define MAX_LAMPEGGI			2000
 	
 #define MAX_BUTTONS	4					// tasti attivi
@@ -177,6 +181,7 @@ void coilReset(void)		// resetta le uscite digitali
 #INT_TIMER0
 void timer0_isr()
 { // scocca ad 1ms
+	setup_timer_0(T0_DIV_16);
 	set_timer0(28);
 
 	flag_1ms = 1;
@@ -237,7 +242,7 @@ void timer0_isr()
 		if (heartBeatTimer == 0)
 		{
 			heartBeatTimer = TIME_HEARTBEAT;
-			RELE_3_TOGGLE;
+//			LED_HEARTBEAT_TOGGLE;
 		}
 	}
 }
@@ -288,6 +293,7 @@ void main()
 	}
 	
 	lockGame = UNLOCK;		// blocca il gioco
+	RELE_3_ON;
 	
 	HeartBeat(1);
 	
@@ -353,7 +359,7 @@ void main()
 void RandomWins(void)
 {
 	unsigned int8 value;
-	printf("[RandomWins]\n");
+//	printf("[RandomWins]\n");
 
 	value=get_timer0();
 	
@@ -370,14 +376,14 @@ void RandomWins(void)
 	
 void Player1wins(void)
 {
-	printf("[Player1wins]\n");
+//	printf("[Player1wins]\n");
 	sirenaOn(); 	// tira il rele 3 per 2 secondi
 	lampeggiante(1);
 }
 	
 void Player2wins(void)
 {
-	printf("[Player2wins]\n");
+//	printf("[Player2wins]\n");
 	sirenaOn(); 	// tira il rele 3 per 2 secondi
 	lampeggiante(2);
 }
@@ -423,13 +429,16 @@ void HeartBeat(unsigned int8 status)
 	if(status == 0)
 	{
 		heartBeatTimer = 0;
+		RELE_3_OFF;
 	}
 	else
 	{
 		heartBeatTimer = TIME_HEARTBEAT;
+		RELE_3_ON;
 	}
 	
-	RELE_3_ON;
+//	LED_HEARTBEAT_ON;
+	
 }
 
 void LockGame(void)
