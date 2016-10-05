@@ -1,3 +1,24 @@
+/*
+ * IDE: MPLAB           8.92.00.00    Certified
+ * Compiler: CCS C 	4.120/4.057
+
+ "Two Players Game"
+
+ * Funzionamento:
+	- all'accensione, uscita 4 ON -> gioco unlocked.
+	- In attesa di pressione PB1 o PB2, Il primo che preme vince.
+	- Se la pressione di pb1 e pb2 è contemporanea, la vincita è random.
+	- pb3 attiva la sirena per un tempo minimo di 1 secondo circa.
+	- pb4 resetta il gioco.
+	
+	cosa accade durante il gioco:
+	- pb1 o pb2 premuti, l'uno esclude l'altro.
+	- sirena passa in on per 1 secondo,
+	- le uscite rl1 o rl2 lampeggiano 4 volte e poi restano fisse fino al reset del gioco
+	- il rele 4 va ad on solo se il gioco è unlocked
+
+*/
+
 #case 
 
 #include <16F628A.h>
