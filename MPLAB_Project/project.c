@@ -5,7 +5,7 @@
 
 #case 
 
-#include <16F628A.h>
+#include <16F648A.h>
 #include "project.h"
 #include "spif.c"
 
@@ -16,7 +16,7 @@ volatile unsigned int8 flag_1s = 0;
 
 #define	DIVISORE_SECONDI 1000
 
-unsigned int16 stp_write(unsigned int16 dataIn);
+unsigned int16 I_O_EXCH(unsigned int16 dataIn);
 
 /****************************************************************************************\
 void coilOutput(void)		// reimposta le uscite digitali
@@ -80,12 +80,17 @@ unsigned char readAddr(void)
 \******************************************************************************************/
 
 
-unsigned int16 stp_write(unsigned int16 dataIn)
+unsigned int16 I_O_EXCH(unsigned int16 dataIn)
 {
 	unsigned int8 i;
 	unsigned int16 dataOut = 0;
 	unsigned int8 position;	// importante partire dall'ultima posizione
-		
+
+		// seriale/parallelo abilito hc165	
+	output_low(PIN_SP);
+	delay_us(10); // aspetta
+	output_high(PIN_SP);
+	
 	// questi finiscono nel secondo STP U6
 	for(i=0; i<16;i++) 
 	{// scrive 16 bit sullo shift register
@@ -137,8 +142,8 @@ void main()
 	setup_ccp1(CCP_OFF);
 	setup_comparator(NC_NC_NC_NC);
 	
-	set_tris_a(0b11100000);
-	set_tris_b(0b11110111);
+	set_tris_a(0b00000000);
+	set_tris_b(0b00000001);
 	set_timer0(28);
 	
 	enable_interrupts(GLOBAL);
@@ -163,8 +168,12 @@ void main()
 		if(flag_100ms) { // sono passati 100ms
 			flag_100ms = 0;
 			
-			retVal = stp_write(data);
-			data <<=1;
+//			data = I_O_EXCH;
+			data = 0x55ff;
+			
+			retVal = I_O_EXCH(data);
+//			data <<=1;
+			
 			spif_n16(retVal);
 		}
 			

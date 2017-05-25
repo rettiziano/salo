@@ -31,16 +31,14 @@
 /************************************************************************************/
 
 /************************************************************************************/
-#define ADDRESS_PIN_1	    	PIN_B5
-#define ADDRESS_PIN_2		   	PIN_B4	
-#define ADDRESS_PIN_3	  		PIN_B0	
+#define PIN_SPIF PIN_A3
 /************************************************************************************/
 
-#define PIN_STP_DATA 	PIN_A0
-#define PIN_STP_CK 		PIN_A1
-#define PIN_STP_LE		PIN_A2
-#define PIN_READ		PIN_A3
+#define PIN_STP_DATA 	PIN_B1
+#define PIN_STP_CK 		PIN_B4
+#define PIN_STP_LE		PIN_B2
+#define PIN_READ		PIN_B0
+#define PIN_SP			PIN_B3
 
 /************************************************************************************/
-
 

@@ -1,7 +1,7 @@
 [PROJECT]
 Target=project.hex
-Processor_Text=PIC16F628A
-CCSVersion=5.025
+Processor_Text=PIC16F648A
+CCSVersion=5.015
 Compiler=PCM
 [Target Data]
 FileList=project.c
@@ -9,6 +9,8 @@ FileList=project.c
 Type=4
 [mru-list]
 1=project.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\devices\;C:\Program Files (x86)\PICC\drivers\
 [Units]
 Count=1
 1=project (main)
