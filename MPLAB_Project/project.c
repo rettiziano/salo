@@ -45,7 +45,7 @@ void coilReset(void)		// resetta le uscite digitali
 #INT_TIMER0
 void timer0_isr()
 { // scocca ad 1ms
-	static unsigned int8 divisore100ms = 0;
+	static unsigned int16 divisore100ms = 0;
 	static unsigned int16 divisoreSecondi = 0;
 	
 	setup_timer_0(T0_DIV_16);
@@ -54,18 +54,18 @@ void timer0_isr()
 	flag_1ms = 1;
 	
 	divisore100ms++;
-	if(divisore100ms == 100){
+	if(divisore100ms >= 100){
 		divisore100ms = 0;
 		flag_100ms = 1;
 	}
 
 	divisoreSecondi++; 
-	if (divisoreSecondi == DIVISORE_SECONDI) { // un secondo
+	if (divisoreSecondi >= DIVISORE_SECONDI) { // un secondo
 		divisoreSecondi = 0;
 		flag_1s = 1;		
 	} // if (divisoreSecondi == 0)
 
-	spif_n8(1);
+	// spif_n8(1);
 }
 
 /******************************************************************************************\
@@ -82,44 +82,43 @@ unsigned char readAddr(void)
 \******************************************************************************************/
 
 
-unsigned int16 I_O_EXCH(unsigned int16 dataIn)
+unsigned int16 I_O_EXCH(unsigned int16 dataIn = 0)
 {
 	unsigned int8 i;
 	unsigned int16 dataOut = 0;
-	unsigned int8 position;	// importante partire dall'ultima posizione
+//	unsigned int8 position;	// importante partire dall'ultima posizione
 
-		// seriale/parallelo abilito hc165	
-	output_low(PIN_SP);
+			
+	output_low(PIN_SP);	// leggo l'ingresso d hc165
 	delay_us(10); // aspetta
 	output_high(PIN_SP);
 	
 	// questi finiscono nel secondo STP U6
 	for(i=0; i<16;i++) 
-	{// scrive 16 bit sullo shift register
+	{// scrive e legge 16 bit sullo shift register
 		
 		// output_bit (PIN, val); assegna val a PIN
 		output_bit (PIN_STP_DATA, ((dataIn & BIT15) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
 		delay_us(10); // aspetta
 		
-		output_high(PIN_STP_CK);	// clock salita
-		delay_us(10); // aspetta
+
 		
-		position = 15-i; // parte daall'ultima posizione e decrementa
-		
-		if(input_state(PIN_READ)) {	// legge il valore del pin di ingresso, se 1...
-			bit_set(dataOut,position); // setta il bit nella posizione indicata
-		} else {
-			bit_clear(dataOut,position); // resetta il bit nella posizione indicata
-		}	
-		
-		output_low(PIN_STP_CK);	// clock discesa
+		dataOut |= (input_state(PIN_READ) & BIT0);
+		dataOut<<=1; // RoL Circular rotation left
 		
 		dataIn <<= 1;	// RoL Circular rotation left
 		delay_us(10); // aspetta
+		
+		
+		output_high(PIN_STP_CK);	// clock salita
+		delay_us(10); // aspetta
+		output_low(PIN_STP_CK);		// clock discesa			
+	
+	
 	}
 
-	// latch enable	
-	output_high(PIN_STP_LE);
+	
+	output_high(PIN_STP_LE);	// latch enable	faccio uscire sul 4094
 	delay_us(10); // aspetta
 	output_low(PIN_STP_LE);
 	
@@ -131,7 +130,7 @@ unsigned int16 I_O_EXCH(unsigned int16 dataIn)
 
 void main()
 {//////////////////////////////  main ////////////////////	
-	unsigned int16 data = 1;
+	unsigned int16 data = 0, dataIN = 0, dataOUT = 0;
 	unsigned int16 retVal = 0;
 	
 	#use fast_io(A)
@@ -151,10 +150,14 @@ void main()
 	enable_interrupts(GLOBAL);
 	enable_interrupts(INT_TIMER0);
 	
+//	data = 0x55ff;
+//	spif_n16(data);
+//	retVal = I_O_EXCH(data);
 	
 	for(;;)
 	{// main loop
 		// restart_wdt();
+
 
 		if (flag_1s) { // e' passato 1 secondo
 			flag_1s = 0;
@@ -169,14 +172,16 @@ void main()
 		
 		if(flag_100ms) { // sono passati 100ms
 			flag_100ms = 0;
+			data = 0b0000000000000001;
+			dataIN = I_O_EXCH;
+			dataOUT = dataIN;
+			dataIN = I_O_EXCH(data);
+			spif_n16(dataIN);
+//			data = 0x00ff;			
 			
-//			data = I_O_EXCH;
-			data = 0x55ff;
-			
-			retVal = I_O_EXCH(data);
 //			data <<=1;
 			
-			spif_n16(retVal);
+			
 		}
 			
 
