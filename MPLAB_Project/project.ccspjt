@@ -1,7 +1,7 @@
 [PROJECT]
 Target=project.hex
 Processor_Text=PIC16F648A
-CCSVersion=5.015
+CCSVersion=5.025
 Compiler=PCM
 [Target Data]
 FileList=project.c
