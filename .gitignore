@@ -10,7 +10,7 @@
 /MPLAB_Project/*.mptags
 /MPLAB_Project/*.PJT
 /MPLAB_Project/*.sym
-/MPLAB_Project/*.tagsrc
+# /MPLAB_Project/*.tagsrc
 /MPLAB_Project/*.tre
 /MPLAB_Project/desktop.ini
 
