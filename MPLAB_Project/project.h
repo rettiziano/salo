@@ -31,19 +31,19 @@
 /************************************************************************************/
 
 /************************************************************************************/
-//#define PIN_SPIF PIN_A4
+// #define PIN_SPIF PIN_A4
 /************************************************************************************/
 
-#define PIN_STP_DATA 		PIN_B1
+#define PIN_STP_DATA 	PIN_B1
 #define PIN_STP_CK 		PIN_B4
 #define PIN_STP_LE		PIN_B2
 #define PIN_READ		PIN_B0
-#define PIN_SP			PIN_B3
+#define PIN_SER_PAR		PIN_B3
 
 /************************************************************************************/
 
-#byte PORTA = 0x05
-#byte PORTB = 0x06
+// #byte PORTA = 0x05
+// #byte PORTB = 0x06
 
 
 // #bit

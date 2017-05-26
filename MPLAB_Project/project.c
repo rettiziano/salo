@@ -8,10 +8,14 @@
 #include <16F648A.h>
 #include "project.h"
 
-#define PIN_SPIF PIN_A3
-#include "spif.c"
+
 
 /****************************************************************************************/
+// assegnare SOLO QUI il pin della spif
+#define PIN_SPIF PIN_A3
+#include "spif.c"
+/****************************************************************************************/
+
 volatile unsigned int8 flag_1ms = 0;	// attivo nell'interrupt
 volatile unsigned int8 flag_100ms = 0;
 volatile unsigned int8 flag_1s = 0;
@@ -91,9 +95,9 @@ unsigned int16 I_O_EXCH(unsigned int16 dataIn = 0)
 //	unsigned int8 position;	// importante partire dall'ultima posizione
 
 			
-	output_low(PIN_SP);	// leggo l'ingresso d hc165
+	output_low(PIN_SER_PAR);	// leggo l'ingresso d hc165
 	delay_us(10); // aspetta
-	output_high(PIN_SP);
+	output_high(PIN_SER_PAR);
 	
 	// questi finiscono nel secondo STP U6
 	for(i=0; i<16;i++) 
