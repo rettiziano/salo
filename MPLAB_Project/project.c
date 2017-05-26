@@ -94,13 +94,16 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	unsigned int16 input_data = 0;
 //	unsigned int8 position;	// importante partire dall'ultima posizione
 
+	#define FIRST_POSITION 0 
+	#define LAST_POSITION 15
+	
 			
 	output_low(PIN_SER_PAR);	// leggo l'ingresso d hc165
 	delay_us(10); // aspetta
 	output_high(PIN_SER_PAR);
 	
 	// questi finiscono nel secondo STP U6
-	for(i=0; i<16;i++) 
+	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
 	{// scrive e legge 16 bit sullo shift register
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -108,9 +111,16 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 		delay_us(10); // aspetta
 		
 		// input_data |= (input_state(PIN_READ) & BIT0);
-		input_data |= (bit_test (data, 15-i));
+		input_data |= (bit_test (data, LAST_POSITION-i));
+		spif_n8(i);
+		spif_n16(input_data);
 		
-		input_data<<=1; // RoL Circular rotation left
+		if(i!= LAST_POSITION) {
+			// non devo spostare a sinistra la posizione della variabile di uscita nell-ultimo giro.
+			input_data<<=1; // RoL Circular rotation left
+		}
+		
+		spif_n16(input_data);
 		
 		output_data <<= 1;	// RoL Circular rotation left
 		delay_us(10); // aspetta
