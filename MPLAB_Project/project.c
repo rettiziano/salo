@@ -170,7 +170,7 @@ void main()
 		// if(flag_100ms) 
 		{ // sono passati 100ms
 			flag_100ms = 0;
-			data = 0b0101010101010101;
+			data = 0b0000000000000001;
 			dataIN = I_O_EXCH(0b0101010101010101);
 			spif_n16(data);	
 			spif_n16(dataIN);
