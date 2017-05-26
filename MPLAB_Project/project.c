@@ -112,15 +112,15 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 		
 		input_data |= (input_state(PIN_READ) & BIT0);
 		// input_data |= (bit_test (data, LAST_POSITION-i));
-		spif_n8(i);
-		spif_n16(input_data);
+//		spif_n8(i);
+//		spif_n16(input_data);
 		
 		if(i!= LAST_POSITION) {
 			// non devo spostare a sinistra la posizione della variabile di uscita nell-ultimo giro.
 			input_data<<=1; // RoL Circular rotation left
 		}
 		
-		spif_n16(input_data);
+//		spif_n16(input_data);
 		
 		output_data <<= 1;	// RoL Circular rotation left
 		delay_us(10); // aspetta
@@ -138,7 +138,46 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	return input_data;
 	
 }
+/////////////////////////////////////////////////////////////
+unsigned int8 DISP(unsigned int8 output_data_disp)
+{
+	unsigned int8 i;
 
+
+
+	#define FIRST_POSITION 0 
+	#define LAST_POSITION 7
+	
+	
+			
+	output_low(PIN_A2);		// abilito il display
+	delay_us(10); 			// aspetta
+
+	
+
+	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	{// scrive 8 bit sullo shift register del display
+		
+		// output_bit (PIN, val); assegna val a PIN
+		output_bit (PIN_A0, ((output_data_disp & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
+		delay_us(10); // aspetta
+		
+		
+		output_data_disp <<= 1;	// RoL Circular rotation left
+		delay_us(10); 		// aspetta
+		
+		output_high(PIN_A1);	// clock salita display
+		delay_us(10); 		// aspetta
+		output_low(PIN_A1);	// clock discesa display			
+	}
+
+	output_high(PIN_A2);	// disabilito il display
+	
+
+	return ;
+	
+}
+/////////////////////////////////////////////////////////////
 
 
 void main()
@@ -175,20 +214,27 @@ void main()
 				var = 0;
 			}
 			*/
+		
 		}	
 		
 		// if(flag_100ms) 
 		{ // sono passati 100ms
 			flag_100ms = 0;
 			data = 0b0000000000000001;
-			dataIN = I_O_EXCH(0b0101010101010101);
-			spif_n16(data);	
+//			dataIN = I_O_EXCH(0b0101010101010101);
+			dataIN = I_O_EXCH(dataIN);
+//			spif_n16(data);	
 			spif_n16(dataIN);
 //			data = 0x00ff;			
 			
 //			data <<=1;
+//////////////////////////////////////////////
+			DISP (0b11111100);
+			DISP (0b11111100);
+			DISP (0b11111100);
+			DISP (0b11111100);			
 			
-			
+//////////////////////////////////////////////			
 		}
 
 		if(flag_1ms) { // e' passato 1ms
