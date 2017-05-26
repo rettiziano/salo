@@ -67,10 +67,10 @@ file_003=mux_4i4u_mb.SYM
 file_004=mux_4i4u_mb.TRE
 file_005=project.SYM
 file_006=project.TRE
-file_007=D:\progetti E\pic\mux_4i4o\CS1139_4_mux_4i4o\modbus_library\spif.c
-file_008=C:\pic\salamon\salo_2_1\MPLAB_Project\project.OSYM
-file_009=D:\progetti E\pic\mux_4i4o\CS1139_4_mux_4i4o\MPLAB_Project\project.SYM
-file_010=D:\progetti E\pic\mux_4i4o\CS1139_4_mux_4i4o\MPLAB_Project\project.TRE
+file_007=C:\pic\salamon\salo_2_1\MPLAB_Project\project.OSYM
+file_008=D:\progetti E\pic\mux_4i4o\CS1139_4_mux_4i4o\MPLAB_Project\project.SYM
+file_009=D:\progetti E\pic\mux_4i4o\CS1139_4_mux_4i4o\MPLAB_Project\project.TRE
+file_010=spif.c
 [SUITE_INFO]
 suite_guid={BA86BF99-4C07-4CE2-A9E7-C2A337910996}
 suite_state=
