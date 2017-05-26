@@ -110,8 +110,8 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 		output_bit (PIN_STP_DATA, ((output_data & BIT15) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
 		delay_us(10); // aspetta
 		
-		// input_data |= (input_state(PIN_READ) & BIT0);
-		input_data |= (bit_test (data, LAST_POSITION-i));
+		input_data |= (input_state(PIN_READ) & BIT0);
+		// input_data |= (bit_test (data, LAST_POSITION-i));
 		spif_n8(i);
 		spif_n16(input_data);
 		
