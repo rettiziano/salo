@@ -139,7 +139,7 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	
 }
 /////////////////////////////////////////////////////////////
-unsigned int8 DISP(unsigned int8 output_data_disp)
+unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 {
 	unsigned int8 i;
 
@@ -152,18 +152,89 @@ unsigned int8 DISP(unsigned int8 output_data_disp)
 			
 	output_low(PIN_A2);		// abilito il display
 	delay_us(10); 			// aspetta
+	
 
 	
+	output_high(PIN_A1);		// clock salita display 33
+	delay_us(10); 			// aspetta
+	output_low(PIN_A1);		// clock discesa display
+	delay_us(10); 			// aspetta
+	output_high(PIN_A1);		// clock salita display 34
+	delay_us(10); 			// aspetta
+	output_low(PIN_A1);		// clock discesa display
+	delay_us(10);			// aspetta
+	output_high(PIN_A1);		// clock salita display 35
+	delay_us(10); 			// aspetta
+	output_low(PIN_A1);		// clock discesa display 
+	delay_us(10);			// aspetta
+	
+	output_high(PIN_A0);		// do due colpi di clock con il bit dati a uno
+	delay_us(10); 			// aspetta
+		
+	output_high(PIN_A1);		// clock salita display 36
+	delay_us(10); 			// aspetta
+	output_low(PIN_A1);		// clock discesa display
+	delay_us(10);			// aspetta
+	
+	output_low(PIN_A0);		// fine ciclo due colpi di clock
+	delay_us(10); 			// aspetta		
 
 	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
-		output_bit (PIN_A0, ((output_data_disp & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
+		output_bit (PIN_A0, ((out_disp_1 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
 		delay_us(10); // aspetta
 		
 		
-		output_data_disp <<= 1;	// RoL Circular rotation left
+		out_disp_1 <<= 1;	// RoL Circular rotation left
+		delay_us(10); 		// aspetta
+		
+		output_high(PIN_A1);	// clock salita display
+		delay_us(10); 		// aspetta
+		output_low(PIN_A1);	// clock discesa display			
+	}
+	
+	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	{// scrive 8 bit sullo shift register del display
+		
+		// output_bit (PIN, val); assegna val a PIN
+		output_bit (PIN_A0, ((out_disp_2 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
+		delay_us(10); // aspetta
+		
+		
+		out_disp_2 <<= 1;	// RoL Circular rotation left
+		delay_us(10); 		// aspetta
+		
+		output_high(PIN_A1);	// clock salita display
+		delay_us(10); 		// aspetta
+		output_low(PIN_A1);	// clock discesa display			
+	}
+	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	{// scrive 8 bit sullo shift register del display
+		
+		// output_bit (PIN, val); assegna val a PIN
+		output_bit (PIN_A0, ((out_disp_3 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
+		delay_us(10); // aspetta
+		
+		
+		out_disp_3 <<= 1;	// RoL Circular rotation left
+		delay_us(10); 		// aspetta
+		
+		output_high(PIN_A1);	// clock salita display
+		delay_us(10); 		// aspetta
+		output_low(PIN_A1);	// clock discesa display			
+	}
+	
+	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	{// scrive 8 bit sullo shift register del display
+		
+		// output_bit (PIN, val); assegna val a PIN
+		output_bit (PIN_A0, ((out_disp_4 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
+		delay_us(10); // aspetta
+		
+		
+		out_disp_4 <<= 1;	// RoL Circular rotation left
 		delay_us(10); 		// aspetta
 		
 		output_high(PIN_A1);	// clock salita display
@@ -171,6 +242,11 @@ unsigned int8 DISP(unsigned int8 output_data_disp)
 		output_low(PIN_A1);	// clock discesa display			
 	}
 
+
+	
+	
+	
+	
 	output_high(PIN_A2);	// disabilito il display
 	
 
@@ -229,10 +305,8 @@ void main()
 			
 //			data <<=1;
 //////////////////////////////////////////////
-			DISP (0b11111100);
-			DISP (0b11111100);
-			DISP (0b11111100);
-			DISP (0b11111100);			
+			DISP (D_P,D_0,D_1,D_2,);
+		
 			
 //////////////////////////////////////////////			
 		}
