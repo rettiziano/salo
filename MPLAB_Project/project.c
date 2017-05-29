@@ -23,6 +23,8 @@ volatile unsigned int8 flag_1s = 0;
 #define	DIVISORE_SECONDI 1000
 
 unsigned int16 I_O_EXCH(unsigned int16 output_data);
+unsigned int8 scriviLettera(unsigned int8 lettera);
+unsigned int8 scriviNumero(unsigned int8 numero);
 
 /****************************************************************************************\
 void coilOutput(void)		// reimposta le uscite digitali
@@ -47,6 +49,30 @@ void coilReset(void)		// resetta le uscite digitali
 	outputStatus = 0;
 }
 \******************************************************************************************/
+
+
+static const unsigned int8 numeri[] = {
+	DISPLAY_0, // visualizza sul diplay 0
+	DISPLAY_1, // visualizza sul diplay 1
+	DISPLAY_2, // visualizza sul diplay 2
+	DISPLAY_3, // visualizza sul diplay 3
+	DISPLAY_4, // visualizza sul diplay 4
+	DISPLAY_5, // visualizza sul diplay 5
+	DISPLAY_6, // visualizza sul diplay 6
+	DISPLAY_7, // visualizza sul diplay 7
+	DISPLAY_8, // visualizza sul diplay 8
+	DISPLAY_9, // visualizza sul diplay 9
+};
+
+static const unsigned int8 lettere[] = {
+	DISPLAY_A, // visualizza sul diplay A
+	DISPLAY_B, // visualizza sul diplay B
+	DISPLAY_C, // visualizza sul diplay C
+	DISPLAY_D, // visualizza sul diplay D
+	DISPLAY_E, // visualizza sul diplay E
+	DISPLAY_F, // visualizza sul diplay F
+	DISPLAY_P  // visualizza sul diplay P
+};
 
 #INT_TIMER0
 void timer0_isr()
@@ -143,12 +169,8 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 {
 	unsigned int8 i;
 
-
-
 	#define FIRST_POSITION 0 
 	#define LAST_POSITION 7
-	
-	
 			
 	output_low(PIN_A2);		// abilito il display
 	delay_us(10); 			// aspetta
@@ -250,7 +272,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 	output_high(PIN_A2);	// disabilito il display
 	
 
-	return ;
+	return 0;
 	
 }
 /////////////////////////////////////////////////////////////
@@ -305,7 +327,7 @@ void main()
 			
 //			data <<=1;
 //////////////////////////////////////////////
-			DISP (D_P,D_0,D_1,D_2,);
+			DISP (scriviLettera[P],scriviNumero[0],scriviNumero[0],scriviNumero[0],);
 		
 			
 //////////////////////////////////////////////			
@@ -317,3 +339,16 @@ void main()
 
 	}// main loop
 }//////////////////////////////  main ////////////////////	
+
+
+
+unsigned int8 scriviLettera(uint8 lettera)
+{
+	return 	lettere[lettera];
+}	
+
+
+unsigned int8 scriviNumero(uint8 numero)
+{
+	return 	numeri[numero];
+}	
