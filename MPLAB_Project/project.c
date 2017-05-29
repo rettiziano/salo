@@ -51,7 +51,7 @@ void coilReset(void)		// resetta le uscite digitali
 \******************************************************************************************/
 
 
-static const unsigned int8 numeri[10] = {
+static const unsigned int8 numeri[] = {
 	DISPLAY_0, // visualizza sul diplay 0
 	DISPLAY_1, // visualizza sul diplay 1
 	DISPLAY_2, // visualizza sul diplay 2
@@ -64,7 +64,7 @@ static const unsigned int8 numeri[10] = {
 	DISPLAY_9, // visualizza sul diplay 9
 };
 
-static const unsigned int8 lettere[7] = {
+static const unsigned int8 lettere[] = {
 	DISPLAY_A, // visualizza sul diplay A
 	DISPLAY_B, // visualizza sul diplay B
 	DISPLAY_C, // visualizza sul diplay C
