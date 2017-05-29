@@ -51,7 +51,7 @@ void coilReset(void)		// resetta le uscite digitali
 \******************************************************************************************/
 
 
-static const unsigned int8 numeri[] = {
+const unsigned int8 numeri[] = {
 	DISPLAY_0, // visualizza sul diplay 0
 	DISPLAY_1, // visualizza sul diplay 1
 	DISPLAY_2, // visualizza sul diplay 2
@@ -64,7 +64,7 @@ static const unsigned int8 numeri[] = {
 	DISPLAY_9, // visualizza sul diplay 9
 };
 
-static const unsigned int8 lettere[] = {
+const unsigned int8 lettere[] = {
 	DISPLAY_A, // visualizza sul diplay A
 	DISPLAY_B, // visualizza sul diplay B
 	DISPLAY_C, // visualizza sul diplay C
@@ -120,10 +120,7 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	unsigned int16 input_data = 0;
 //	unsigned int8 position;	// importante partire dall'ultima posizione
 
-	#define FIRST_POSITION 0 
-	#define LAST_POSITION 15
-	
-			
+
 	output_low(PIN_SER_PAR);	// leggo l'ingresso d hc165
 	delay_us(10); // aspetta
 	output_high(PIN_SER_PAR);
@@ -169,8 +166,6 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 {
 	unsigned int8 i;
 
-	#define FIRST_POSITION 0 
-	#define LAST_POSITION 7
 			
 	output_low(PIN_A2);		// abilito il display
 	delay_us(10); 			// aspetta
