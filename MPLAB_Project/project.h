@@ -77,13 +77,13 @@
 
 
 
-#define A 0	// posizione in hex array di lettera
-#define B 1	// posizione in hex array di lettera
-#define C 2	// posizione in hex array di lettera
-#define D 3	// posizione in hex array di lettera
-#define E 4	// posizione in hex array di lettera
-#define F 5	// posizione in hex array di lettera
-#define P 6	// posizione in hex array di lettera
+#define _A 0	// posizione in hex array di lettera
+#define _B 1	// posizione in hex array di lettera
+#define _C 2	// posizione in hex array di lettera
+#define _D 3	// posizione in hex array di lettera
+#define _E 4	// posizione in hex array di lettera
+#define _F 5	// posizione in hex array di lettera
+#define _P 6	// posizione in hex array di lettera
 
 
 

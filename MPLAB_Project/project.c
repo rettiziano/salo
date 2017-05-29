@@ -51,7 +51,7 @@ void coilReset(void)		// resetta le uscite digitali
 \******************************************************************************************/
 
 
-const unsigned int8 numeri[] = {
+static const unsigned int8 numeri[10] = {
 	DISPLAY_0, // visualizza sul diplay 0
 	DISPLAY_1, // visualizza sul diplay 1
 	DISPLAY_2, // visualizza sul diplay 2
@@ -64,7 +64,7 @@ const unsigned int8 numeri[] = {
 	DISPLAY_9, // visualizza sul diplay 9
 };
 
-const unsigned int8 lettere[] = {
+static const unsigned int8 lettere[7] = {
 	DISPLAY_A, // visualizza sul diplay A
 	DISPLAY_B, // visualizza sul diplay B
 	DISPLAY_C, // visualizza sul diplay C
@@ -322,7 +322,7 @@ void main()
 			
 //			data <<=1;
 //////////////////////////////////////////////
-			DISP (scriviLettera[P],scriviNumero[0],scriviNumero[0],scriviNumero[0],);
+		DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(1),scriviNumero(2));
 		
 			
 //////////////////////////////////////////////			
@@ -337,13 +337,13 @@ void main()
 
 
 
-unsigned int8 scriviLettera(uint8 lettera)
+unsigned int8 scriviLettera(unsigned int8 lettera)
 {
 	return 	lettere[lettera];
 }	
 
 
-unsigned int8 scriviNumero(uint8 numero)
+unsigned int8 scriviNumero(unsigned int8 numero)
 {
 	return 	numeri[numero];
 }	
