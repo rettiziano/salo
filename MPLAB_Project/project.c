@@ -8,7 +8,7 @@
 #include <16F648A.h>
 #include "project.h"
 
-unsigned int16 data = 0;
+// unsigned int16 data = 0;
 
 /****************************************************************************************/
 // assegnare SOLO QUI il pin della spif
@@ -25,6 +25,8 @@ volatile unsigned int8 flag_1s = 0;
 unsigned int16 I_O_EXCH(unsigned int16 output_data);
 unsigned int8 scriviLettera(unsigned int8 lettera);
 unsigned int8 scriviNumero(unsigned int8 numero);
+
+void programma(void);
 
 /****************************************************************************************\
 void coilOutput(void)		// reimposta le uscite digitali
@@ -274,9 +276,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 
 void main()
 {//////////////////////////////  main ////////////////////	
-	unsigned int16 dataIN = 0, dataOUT = 0;
-	unsigned int16 retVal = 0;
-	
+
 	#use fast_io(A)
 	#use fast_io(B)
 	
@@ -312,11 +312,11 @@ void main()
 		// if(flag_100ms) 
 		{ // sono passati 100ms
 			flag_100ms = 0;
-			data = 0b0000000000000001;
+//			data = 0b0000000000000001;
 //			dataIN = I_O_EXCH(0b0101010101010101);
-			dataIN = I_O_EXCH(dataIN);
+//			dataIN = I_O_EXCH(dataIN);
 //			spif_n16(data);	
-			spif_n16(dataIN);
+//			spif_n16(dataIN);
 //			data = 0x00ff;			
 			
 //			data <<=1;
@@ -328,6 +328,7 @@ void main()
 		}
 
 		if(flag_1ms) { // e' passato 1ms
+			programma();
 			flag_1ms = 0;
 		}
 
@@ -346,3 +347,72 @@ unsigned int8 scriviNumero(unsigned int8 numero)
 {
 	return 	numeri[numero];
 }	
+
+
+void programma(void)
+{
+	//--------------------------------------------------------
+	unsigned int8 stat = 0;	
+	
+	unsigned int16 dataIN = 0;
+	unsigned int16 dataOUT = 0;
+// 	unsigned int16 retVal = 0;
+	
+	dataIN = I_O_EXCH(dataOUT);
+//	spif_n16(dataIN);
+	switch(stat) //cicla tra un case e l'altro in funzione dello stato di avanzamento
+	{
+		case 0x00:	// passo 0 qui dentro ciclo quando c'e' un arresto macchina 
+	
+			dataIN = I_O_EXCH(dataOUT);
+			if ((dataIN & 0b0000000000000010) > 1)
+			{
+				DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(0),scriviNumero(0));			
+				stat = 1;
+				dataOUT = 0b0000000000000010; //accendo solo la luce rossa del lampeggiante
+			} 
+	//		break;
+			
+		case 0x01:	// passo 1 qui rimango fino quando arriva lo start 
+	
+			dataIN = I_O_EXCH(dataOUT);
+			if ((dataIN & 0b0000000000000001) > 1)
+			{
+				DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(0),scriviNumero(1));	
+				stat = 3;
+				dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
+			} 
+			else 
+			{ 
+			stat = 1;
+			}
+	//		break;
+			
+		case 0x02:	// passo 2 qui dentro resetto il ciclo della macchina 
+			dataIN = I_O_EXCH(dataOUT);
+			if ((dataIN & 0b0000000000000100) > 1)
+			{
+				DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(0),scriviNumero(2));	
+				stat = 2;
+				dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
+			} 
+			else 
+			{ 
+			stat = 0;
+			}		
+			
+		case 0x03:
+		
+			stat = 0;
+			break;
+			
+		default:
+		
+			stat = 0;
+			break;
+	}
+		
+	//--------------------------------------------------------	
+}	
+
+
