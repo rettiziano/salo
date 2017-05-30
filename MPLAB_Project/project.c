@@ -39,6 +39,8 @@ void coilOutput(void)		// reimposta le uscite digitali
 \*****************************************************************************************/
 
 
+#define PL(x) scriviLettera(x)
+#define PN(x) scriviNumero(x)
 
 /******************************************************************************************\
 void coilReset(void)		// resetta le uscite digitali
@@ -321,7 +323,7 @@ void main()
 			
 //			data <<=1;
 //////////////////////////////////////////////
-		DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(1),scriviNumero(2));
+		DISP (PL(_P),PN(0),PN(1),PN(2));
 		
 			
 //////////////////////////////////////////////			
@@ -367,7 +369,7 @@ void programma(void)
 			dataIN = I_O_EXCH(dataOUT);
 			if ((dataIN & 0b0000000000000010) > 1)
 			{
-				DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(0),scriviNumero(0));			
+				DISP (PL(_P),PN(0),PN(0),PN(0));			
 				stat = 1;
 				dataOUT = 0b0000000000000010; //accendo solo la luce rossa del lampeggiante
 			} 
@@ -378,7 +380,7 @@ void programma(void)
 			dataIN = I_O_EXCH(dataOUT);
 			if ((dataIN & 0b0000000000000001) > 1)
 			{
-				DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(0),scriviNumero(1));	
+				DISP (PL(_P),PN(0),PN(0),PN(1));	
 				stat = 3;
 				dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
 			} 
@@ -392,7 +394,7 @@ void programma(void)
 			dataIN = I_O_EXCH(dataOUT);
 			if ((dataIN & 0b0000000000000100) > 1)
 			{
-				DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(0),scriviNumero(2));	
+				DISP (PL(_P),PN(0),PN(0),PN(2));	
 				stat = 2;
 				dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
 			} 
