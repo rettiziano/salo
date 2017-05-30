@@ -26,7 +26,7 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data);
 unsigned int8 scriviLettera(unsigned int8 lettera);
 unsigned int8 scriviNumero(unsigned int8 numero);
 
-void programma(void);
+void MainProgram(void);
 
 /****************************************************************************************\
 void coilOutput(void)		// reimposta le uscite digitali
@@ -37,7 +37,6 @@ void coilOutput(void)		// reimposta le uscite digitali
 	output_bit(DO3,bit_test(outputStatus,3));
 }
 \*****************************************************************************************/
-
 
 #define PL(x) scriviLettera(x)
 #define PN(x) scriviNumero(x)
@@ -75,7 +74,12 @@ static const unsigned int8 lettere[] = {
 	DISPLAY_D, // visualizza sul diplay D
 	DISPLAY_E, // visualizza sul diplay E
 	DISPLAY_F, // visualizza sul diplay F
-	DISPLAY_P  // visualizza sul diplay P
+	DISPLAY_P, // visualizza sul diplay P
+	DISPLAY_I, // visualizza sul diplay I
+	DISPLAY_N, // visualizza sul diplay n
+	DISPLAY_T, // visualizza sul diplay t
+	DISPLAY_R, // visualizza sul diplay r
+	DISPLAY_S, // visualizza sul diplay r
 };
 
 #INT_TIMER0
@@ -296,6 +300,10 @@ void main()
 	enable_interrupts(GLOBAL);
 	enable_interrupts(INT_TIMER0);
 	
+	DISP (DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF);
+	DISP (PL(_I),PL(_N),PL(_I),PL(_T));
+	delay_ms(1000);
+	
 	for(;;)
 	{// main loop
 		// restart_wdt();
@@ -311,7 +319,7 @@ void main()
 		
 		}	
 		
-		// if(flag_100ms) 
+		if(flag_100ms) 
 		{ // sono passati 100ms
 			flag_100ms = 0;
 //			data = 0b0000000000000001;
@@ -323,14 +331,14 @@ void main()
 			
 //			data <<=1;
 //////////////////////////////////////////////
-		DISP (PL(_P),PN(0),PN(1),PN(2));
+			// DISP (PL(_P),PN(0),PN(1),PN(2));
 		
 			
 //////////////////////////////////////////////			
 		}
 
 		if(flag_1ms) { // e' passato 1ms
-			programma();
+			MainProgram();
 			flag_1ms = 0;
 		}
 
@@ -351,66 +359,141 @@ unsigned int8 scriviNumero(unsigned int8 numero)
 }	
 
 
-void programma(void)
+
+void MainProgram(void)
 {
-	//--------------------------------------------------------
-	unsigned int8 stat = 0;	
+	//------------------entro ogni ms --------------------------------------
+	static unsigned int8 statoMacchina = ST_IDLE;	
+	static unsigned int8 statoErrore = NO_ERROR;
+	static unsigned int16 dataOUT = 0;	
+	static unsigned int8 provenienza = 0;
+	static unsigned int16 wait = 0;	
 	
 	unsigned int16 dataIN = 0;
-	unsigned int16 dataOUT = 0;
+
+
+
+	static unsigned int8 testSeq = 0;
+
 // 	unsigned int16 retVal = 0;
 	
-	dataIN = I_O_EXCH(dataOUT);
-//	spif_n16(dataIN);
-	switch(stat) //cicla tra un case e l'altro in funzione dello stato di avanzamento
+	// dataIN = I_O_EXCH(dataOUT);
+	//	spif_n16(dataIN);
+	
+	switch(statoMacchina) //cicla tra un case e l'altro in funzione dello stato di avanzamento
 	{
-		case 0x00:	// passo 0 qui dentro ciclo quando c'e' un arresto macchina 
-	
-			dataIN = I_O_EXCH(dataOUT);
-			if ((dataIN & 0b0000000000000010) > 1)
-			{
-				DISP (PL(_P),PN(0),PN(0),PN(0));			
-				stat = 1;
-				dataOUT = 0b0000000000000010; //accendo solo la luce rossa del lampeggiante
-			} 
-	//		break;
+		case ST_IDLE:	// passo 0 qui dentro ciclo quando c'e' un arresto macchina 
+		{
+			dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
 			
-		case 0x01:	// passo 1 qui rimango fino quando arriva lo start 
-	
-			dataIN = I_O_EXCH(dataOUT);
-			if ((dataIN & 0b0000000000000001) > 1)
-			{
-				DISP (PL(_P),PN(0),PN(0),PN(1));	
-				stat = 3;
-				dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
+			if ((dataIN & SENSORI) == 0) 
+			{	
+				// DISP (PL(_P),PN(0),PN(0),PN(0));			
+				statoMacchina = ST_ALARM_1;
+				dataOUT = LUCE_ROSSA; //accendo solo la luce rossa del lampeggiante
+				I_O_EXCH(dataOUT);	// scrivo l'usicta
+				break;
 			} 
-			else 
-			{ 
-			stat = 1;
-			}
-	//		break;
-			
-		case 0x02:	// passo 2 qui dentro resetto il ciclo della macchina 
-			dataIN = I_O_EXCH(dataOUT);
-			if ((dataIN & 0b0000000000000100) > 1)
-			{
-				DISP (PL(_P),PN(0),PN(0),PN(2));	
-				stat = 2;
-				dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
-			} 
-			else 
-			{ 
-			stat = 0;
-			}		
-			
-		case 0x03:
 		
-			stat = 0;
-			break;
+			if (dataIN & ARRESTO_STOP)
+			{
+				// DISP (PL(_P),PN(0),PN(0),PN(1));	
+				statoMacchina = ST_ALARM_2;
+				dataOUT = LUCE_GIALLA; //accendo solo la luce gialla del lampeggiante
+				I_O_EXCH(dataOUT);	// leggo anche i tasti
+				break;
+			} 
+			
+			if (dataIN & MARCIA_START)
+			{	
+				DISP (PL(_S),PL(_T),PL(_R),PL(_T));	
+				statoMacchina = ST_START;
+				dataOUT = LUCE_VERDE; //si parte, luce verde
+				I_O_EXCH(dataOUT);	// leggo anche i tasti
+				break;
+			} else {
+				// sto fermo qua in attesa
+				
+			} 	 
+		}
+		break;
+		
+		case ST_ALARM_1:
+		{
+			// sto qua fin che muoio per il momento
+			DISP (PL(_E),PL(_R),PL(_R),PN(ERROR_1));			
+			statoErrore = ERROR_1;
+			
+			// ora devo testare cosa: l'uinterruttore che si apra: quale: 
+			dataOUT = LUCE_ROSSA; //accendo solo la luce rossa del lampeggiante
+			dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
+			if(dataIN & SWITCH_RESET) {
+				// esco da qua premendo un reset.
+				statoMacchina	= ST_IDLE;
+				break;
+			} else {
+				// resto qua in attesa;
+			}	
+			
+		}	
+		break;
+		
+		
+		case ST_ALARM_2:
+		{
+			// sto qua fin che muoio per il momento
+			DISP (PL(_E),PL(_R),PL(_R),PN(ERROR_2));			
+			statoErrore = ERROR_2;
+			
+			// ora devo testare cosa: l'uinterruttore che si apra: quale: 
+			dataOUT = LUCE_GIALLA; //accendo solo la luce rossa del lampeggiante
+			dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
+			if(dataIN & SWITCH_RESET) {
+				// esco da qua premendo un reset.
+				statoMacchina	= ST_IDLE;
+			}	
+		}	
+		break;
+		
+		case ST_START:
+		{
+			// sto qua fin che muoio per il momento
+			statoErrore = NO_ERROR; // tenere o buttare l'ultimo errore
+			provenienza = ST_START;
+			// ciclo qua dentro ogni ms
+			
+			
+			
+			
+			
+			DISP (PL(_T),PN(0),PN(0),PN(testSeq));	
+			wait = 500;	// prima di tornare qua aspetto un tempo "wait"
+			testSeq++;
+			// testSeq &= 7; //  si ferma a 7
+			if (testSeq == 8)  {
+				// quando arrivza a 8 va in allarme
+				provenienza = ST_ALARM_1; 
+			}
+				
+			statoMacchina = ST_WAIT;
+		}	
+		break;
+			
+		case ST_WAIT:
+		{
+			if(wait) {
+				wait--;
+				if(wait == 0) {
+					// esci.
+					statoMacchina = provenienza; // torna indietro
+				}		
+			}
+		}	
+		break;	
 			
 		default:
 		
-			stat = 0;
+			statoMacchina = 0;
 			break;
 	}
 		

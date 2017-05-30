@@ -34,11 +34,51 @@
 // #define PIN_SPIF PIN_A4
 /************************************************************************************/
 
-#define PIN_STP_DATA 		PIN_B1
+#define PIN_STP_DATA 	PIN_B1
 #define PIN_STP_CK 		PIN_B4
 #define PIN_STP_LE		PIN_B2
 #define PIN_READ		PIN_B0
 #define PIN_SER_PAR		PIN_B3
+
+/* uscite ***************************************************************************/
+#define EV1_CHIUDE		BIT0
+#define EV1_APRE		BIT1
+#define EV2_CHIUDE		BIT2
+#define EV2_APRE		BIT3
+#define EV3_CHIUDE		BIT4
+#define EV3_APRE		BIT5
+#define EV4_CHIUDE		BIT6
+#define EV4_APRE		BIT7
+#define EV5_CHIUDE		BIT8
+#define EV5_APRE		BIT9
+#define EV6_CHIUDE		BIT10
+#define EV6_APRE		BIT11
+
+#define LUCE_GIALLA		BIT12
+#define LUCE_VERDE		BIT13
+#define LUCE_ROSSA		BIT14
+
+/* ingressi *************************************************************************/
+
+#define MARCIA_START	BIT0
+#define ARRESTO_STOP    BIT1
+#define SWITCH_RESET    BIT2
+
+#define P1_APRE		    BIT3
+#define P1_CHIUDE	    BIT4
+#define P2_APRE		    BIT5
+#define P2_CHIUDE	    BIT6
+#define P3_APRE		    BIT7
+#define P3_CHIUDE	    BIT8
+#define P4_APRE		    BIT9
+#define P4_CHIUDE	    BIT10
+#define P5_APRE		    BIT11
+#define P5_CHIUDE	    BIT12
+#define P6_APRE		    BIT13
+#define P6_CHIUDE	    BIT14
+
+#define SENSORI		    BIT15
+
 
 /************************************************************************************/
 
@@ -71,17 +111,45 @@
 #define DISPLAY_E 0b10011110  // visualizza sul diplay E
 #define DISPLAY_F 0b10001110  // visualizza sul diplay F
 #define DISPLAY_P 0b11001110  // visualizza sul diplay P
+#define DISPLAY_I 0b11000000  // visualizza sul diplay I
+#define DISPLAY_N 0b00101010  // visualizza sul diplay n
+#define DISPLAY_T 0b00011110  // visualizza sul diplay t
+#define DISPLAY_R 0b00001010  // visualizza sul diplay r
+#define DISPLAY_S 0b10110110  // visualizza sul diplay S
+
+#define DISPLAY_OFF 0 
+
+enum _pos_ { 	// posizione in hex array di lettera
+	_A = 0,
+	_B,	
+	_C, 
+	_D, 
+	_E, 
+	_F,
+	_P, 
+	_I, 
+	_N, 
+	_T,
+	_R,
+	_S,
+};	
 
 
 
-#define _A 0	// posizione in hex array di lettera
-#define _B 1	// posizione in hex array di lettera
-#define _C 2	// posizione in hex array di lettera
-#define _D 3	// posizione in hex array di lettera
-#define _E 4	// posizione in hex array di lettera
-#define _F 5	// posizione in hex array di lettera
-#define _P 6	// posizione in hex array di lettera
+enum _stati_ {
+	ST_IDLE = 0,
+	ST_ALARM_1,
+	ST_ALARM_2,
+	ST_START,
+	ST_WAIT,	
+	
+	
+	
+};	
 
-
-
-
+enum _err_ {
+	NO_ERROR = 0,
+	ERROR_1,	// errore ...
+	ERROR_2,	// errore ... 
+	ERROR_3,	// errore ...
+};
