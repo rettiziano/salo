@@ -119,14 +119,14 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	unsigned int8 i;
 	unsigned int16 input_data = 0;
 //	unsigned int8 position;	// importante partire dall'ultima posizione
-
+	static const unsigned int8 lastPosition_16 = 16;
 
 	output_low(PIN_SER_PAR);	// leggo l'ingresso d hc165
 	delay_us(10); // aspetta
 	output_high(PIN_SER_PAR);
 	
 	// questi finiscono nel secondo STP U6
-	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	for(i=0; i<=lastPosition_16;i++) 
 	{// scrive e legge 16 bit sullo shift register
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -138,7 +138,7 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 //		spif_n8(i);
 //		spif_n16(input_data);
 		
-		if(i!= LAST_POSITION) {
+		if(i!= lastPosition_16) {
 			// non devo spostare a sinistra la posizione della variabile di uscita nell-ultimo giro.
 			input_data<<=1; // RoL Circular rotation left
 		}
@@ -171,7 +171,6 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 	delay_us(10); 			// aspetta
 	
 
-	
 	output_high(PIN_A1);		// clock salita display 33
 	delay_us(10); 			// aspetta
 	output_low(PIN_A1);		// clock discesa display
@@ -196,7 +195,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 	output_low(PIN_A0);		// fine ciclo due colpi di clock
 	delay_us(10); 			// aspetta		
 
-	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	for(i=0; i<=8;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -212,7 +211,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_low(PIN_A1);	// clock discesa display			
 	}
 	
-	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	for(i=0; i<=8;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -227,7 +226,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		delay_us(10); 		// aspetta
 		output_low(PIN_A1);	// clock discesa display			
 	}
-	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	for(i=0; i<=8;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -243,7 +242,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_low(PIN_A1);	// clock discesa display			
 	}
 	
-	for(i=FIRST_POSITION; i<=LAST_POSITION;i++) 
+	for(i=0; i<=8;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
