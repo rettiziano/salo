@@ -111,7 +111,7 @@
 #define DISPLAY_E 0b10011110  // visualizza sul diplay E
 #define DISPLAY_F 0b10001110  // visualizza sul diplay F
 #define DISPLAY_P 0b11001110  // visualizza sul diplay P
-#define DISPLAY_I 0b11000000  // visualizza sul diplay I
+#define DISPLAY_I 0b00100000  // visualizza sul diplay I
 #define DISPLAY_N 0b00101010  // visualizza sul diplay n
 #define DISPLAY_T 0b00011110  // visualizza sul diplay t
 #define DISPLAY_R 0b00001010  // visualizza sul diplay r

@@ -127,14 +127,14 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	unsigned int8 i;
 	unsigned int16 input_data = 0;
 //	unsigned int8 position;	// importante partire dall'ultima posizione
-	static const unsigned int8 lastPosition_16 = 16;
+	static const unsigned int8 lastPosition = 15;
 
 	output_low(PIN_SER_PAR);	// leggo l'ingresso d hc165
 	delay_us(10); // aspetta
 	output_high(PIN_SER_PAR);
 	
 	// questi finiscono nel secondo STP U6
-	for(i=0; i<=lastPosition_16;i++) 
+	for(i=0; i<=lastPosition;i++) 
 	{// scrive e legge 16 bit sullo shift register
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -146,7 +146,7 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 //		spif_n8(i);
 //		spif_n16(input_data);
 		
-		if(i!= lastPosition_16) {
+		if(i!= lastPosition) {
 			// non devo spostare a sinistra la posizione della variabile di uscita nell-ultimo giro.
 			input_data<<=1; // RoL Circular rotation left
 		}
@@ -173,7 +173,7 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 {
 	unsigned int8 i;
-
+    static const unsigned int8 lastPosition = 7;
 			
 	output_low(PIN_A2);		// abilito il display
 	delay_us(10); 			// aspetta
@@ -203,7 +203,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 	output_low(PIN_A0);		// fine ciclo due colpi di clock
 	delay_us(10); 			// aspetta		
 
-	for(i=0; i<=8;i++) 
+	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -219,7 +219,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_low(PIN_A1);	// clock discesa display			
 	}
 	
-	for(i=0; i<=8;i++) 
+	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -234,7 +234,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		delay_us(10); 		// aspetta
 		output_low(PIN_A1);	// clock discesa display			
 	}
-	for(i=0; i<=8;i++) 
+	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -250,7 +250,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_low(PIN_A1);	// clock discesa display			
 	}
 	
-	for(i=0; i<=8;i++) 
+	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
 		// output_bit (PIN, val); assegna val a PIN
@@ -266,11 +266,6 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_low(PIN_A1);	// clock discesa display			
 	}
 
-
-	
-	
-	
-	
 	output_high(PIN_A2);	// disabilito il display
 	
 
@@ -300,9 +295,9 @@ void main()
 	enable_interrupts(GLOBAL);
 	enable_interrupts(INT_TIMER0);
 	
-	DISP (DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF);
+	// DISP (DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF);
 	DISP (PL(_I),PL(_N),PL(_I),PL(_T));
-	delay_ms(1000);
+	delay_ms(2000);
 	
 	for(;;)
 	{// main loop
@@ -339,6 +334,7 @@ void main()
 
 		if(flag_1ms) { // e' passato 1ms
 			MainProgram();
+			// spif_n8(1);
 			flag_1ms = 0;
 		}
 
@@ -386,12 +382,15 @@ void MainProgram(void)
 		{
 			dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
 			
+			// spif_n16(dataIN);
+		
 			if ((dataIN & SENSORI) == 0) 
 			{	
 				// DISP (PL(_P),PN(0),PN(0),PN(0));			
 				statoMacchina = ST_ALARM_1;
 				dataOUT = LUCE_ROSSA; //accendo solo la luce rossa del lampeggiante
 				I_O_EXCH(dataOUT);	// scrivo l'usicta
+				spif_n16(0xE001);
 				break;
 			} 
 		
@@ -401,6 +400,7 @@ void MainProgram(void)
 				statoMacchina = ST_ALARM_2;
 				dataOUT = LUCE_GIALLA; //accendo solo la luce gialla del lampeggiante
 				I_O_EXCH(dataOUT);	// leggo anche i tasti
+				spif_n16(0xE002);
 				break;
 			} 
 			
@@ -410,11 +410,12 @@ void MainProgram(void)
 				statoMacchina = ST_START;
 				dataOUT = LUCE_VERDE; //si parte, luce verde
 				I_O_EXCH(dataOUT);	// leggo anche i tasti
+				spif_n16(0x5001);
 				break;
 			} else {
 				// sto fermo qua in attesa
 				
-			} 	 
+			} 	
 		}
 		break;
 		
@@ -466,13 +467,15 @@ void MainProgram(void)
 			
 			
 			
-			DISP (PL(_T),PN(0),PN(0),PN(testSeq));	
+			DISP (PN(testSeq),PN(testSeq),PN(testSeq),PN(testSeq));	
 			wait = 500;	// prima di tornare qua aspetto un tempo "wait"
 			testSeq++;
-			// testSeq &= 7; //  si ferma a 7
+			testSeq &= 7; //  si ferma a 7
+			spif_n8(testSeq);
 			if (testSeq == 8)  {
 				// quando arrivza a 8 va in allarme
-				provenienza = ST_ALARM_1; 
+				// provenienza = ST_ALARM_1; 
+				// testSeq 
 			}
 				
 			statoMacchina = ST_WAIT;
