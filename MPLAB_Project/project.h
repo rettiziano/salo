@@ -116,7 +116,7 @@
 #define DISPLAY_T 0b00011110  // visualizza sul diplay t
 #define DISPLAY_R 0b00001010  // visualizza sul diplay r
 #define DISPLAY_S 0b10110110  // visualizza sul diplay S
-
+#define DISPLAY_L 0b00011100  // visualizza sul diplay S
 #define DISPLAY_OFF 0 
 
 enum _pos_ { 	// posizione in hex array di lettera
@@ -132,6 +132,7 @@ enum _pos_ { 	// posizione in hex array di lettera
 	_T,
 	_R,
 	_S,
+	_L,
 };	
 
 
@@ -139,9 +140,9 @@ enum _pos_ { 	// posizione in hex array di lettera
 enum _stati_ {
 	ST_IDLE = 0,
 	ST_ALARM_1,
-	ST_ALARM_2,
 	ST_START,
-	ST_WAIT,	
+	ST_WAIT,
+	ST_ARRESTO,
 	
 	
 	

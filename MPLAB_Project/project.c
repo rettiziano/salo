@@ -28,6 +28,8 @@ unsigned int8 scriviNumero(unsigned int8 numero);
 
 void MainProgram(void);
 
+static unsigned int16 dataOUT = 0;	
+	
 /****************************************************************************************\
 void coilOutput(void)		// reimposta le uscite digitali
 {
@@ -80,6 +82,7 @@ static const unsigned int8 lettere[] = {
 	DISPLAY_T, // visualizza sul diplay t
 	DISPLAY_R, // visualizza sul diplay r
 	DISPLAY_S, // visualizza sul diplay r
+	DISPLAY_L, // visualizza sul diplay L
 };
 
 #INT_TIMER0
@@ -174,20 +177,21 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 {
 	unsigned int8 i;
     static const unsigned int8 lastPosition = 7;
-			
+		
+	// spif_n8(0xd0);	
 	output_low(PIN_A2);		// abilito il display
 	delay_us(10); 			// aspetta
 	
 
-	output_high(PIN_A1);		// clock salita display 33
+	output_high(PIN_A1);	// clock salita display 33
 	delay_us(10); 			// aspetta
 	output_low(PIN_A1);		// clock discesa display
 	delay_us(10); 			// aspetta
-	output_high(PIN_A1);		// clock salita display 34
+	output_high(PIN_A1);	// clock salita display 34
 	delay_us(10); 			// aspetta
 	output_low(PIN_A1);		// clock discesa display
 	delay_us(10);			// aspetta
-	output_high(PIN_A1);		// clock salita display 35
+	output_high(PIN_A1);	// clock salita display 35
 	delay_us(10); 			// aspetta
 	output_low(PIN_A1);		// clock discesa display 
 	delay_us(10);			// aspetta
@@ -234,6 +238,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		delay_us(10); 		// aspetta
 		output_low(PIN_A1);	// clock discesa display			
 	}
+	
 	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
 		
@@ -266,6 +271,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_low(PIN_A1);	// clock discesa display			
 	}
 
+
 	output_high(PIN_A2);	// disabilito il display
 	
 
@@ -296,7 +302,7 @@ void main()
 	enable_interrupts(INT_TIMER0);
 	
 	// DISP (DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF);
-	DISP (PL(_I),PL(_N),PL(_I),PL(_T));
+	DISP (PL(_I),PL(_D),PL(_L),PL(_E));
 	delay_ms(2000);
 	
 	for(;;)
@@ -361,7 +367,7 @@ void MainProgram(void)
 	//------------------entro ogni ms --------------------------------------
 	static unsigned int8 statoMacchina = ST_IDLE;	
 	static unsigned int8 statoErrore = NO_ERROR;
-	static unsigned int16 dataOUT = 0;	
+
 	static unsigned int8 provenienza = 0;
 	static unsigned int16 wait = 0;	
 	
@@ -376,60 +382,93 @@ void MainProgram(void)
 	// dataIN = I_O_EXCH(dataOUT);
 	//	spif_n16(dataIN);
 	
+	dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
+			
+	// spif_n16(dataIN);
+
+	if ((dataIN & SENSORI) == 0) 
+	{	
+		// DISP (PL(_P),PN(0),PN(0),PN(0));			
+		statoMacchina = ST_ALARM_1;
+		dataOUT = LUCE_ROSSA; //accendo solo la luce ROSSA del lampeggiante
+		I_O_EXCH(dataOUT);	// scrivo l'usicta
+		// spif_n16(dataIN);
+		spif_n16(0xE001);
+		DISP (PL(_E),PL(_R),PL(_R),PN(ERROR_1));			
+		statoErrore = ERROR_1;
+		break;
+	} 
+
+	if (dataIN & ARRESTO_STOP)
+	{
+		// DISP (PL(_P),PN(0),PN(0),PN(1));	
+		if(statoMacchina != ST_ARRESTO) {
+			provenienza = statoMacchina; // metto via
+			// spif_n8(provenienza);
+			statoMacchina = ST_ARRESTO;
+			dataOUT |= LUCE_GIALLA; //accendo in piu la luce gialla del lampeggiante
+			I_O_EXCH(dataOUT);	// leggo anche i tasti
+			// spif_n16(dataIN);
+			spif_n16(0xE002);
+			DISP (PN(5),PL(_T),PN(0),PL(_P));
+			DISP (PN(5),PL(_T),PN(0),PL(_P));
+			statoErrore = ERROR_2;	
+		}
+		break;
+	} else {
+		if(statoMacchina == ST_ARRESTO) {
+			if(provenienza == ST_WAIT) {
+				statoMacchina = ST_WAIT;
+				provenienza = ST_START;
+			}
+			// spif_n8(provenienza);
+			if(dataOUT & LUCE_GIALLA) {
+				dataOUT &= ~LUCE_GIALLA; //accendo in piu la luce gialla del lampeggiante
+				I_O_EXCH(dataOUT);	// leggo anche i tasti
+			}
+			break;
+		}
+	}
+	
+	
+	if (dataIN & MARCIA_START)
+	{	
+		if(statoMacchina == ST_IDLE) {
+			statoMacchina = ST_START;
+			DISP (PL(_S),PL(_T),PL(_R),PL(_T));	
+			statoMacchina = ST_START;
+			dataOUT = LUCE_VERDE; //si parte, luce verde
+			I_O_EXCH(dataOUT);	// leggo anche i tasti
+			// spif_n16(dataIN);
+			spif_n16(0x5001);
+		}
+		break;
+	} else {
+		// sto fermo qua in attesa
+		
+	} 	
+	
+	
 	switch(statoMacchina) //cicla tra un case e l'altro in funzione dello stato di avanzamento
 	{
 		case ST_IDLE:	// passo 0 qui dentro ciclo quando c'e' un arresto macchina 
-		{
-			dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
+		{ 
 			
-			// spif_n16(dataIN);
-		
-			if ((dataIN & SENSORI) == 0) 
-			{	
-				// DISP (PL(_P),PN(0),PN(0),PN(0));			
-				statoMacchina = ST_ALARM_1;
-				dataOUT = LUCE_ROSSA; //accendo solo la luce rossa del lampeggiante
-				I_O_EXCH(dataOUT);	// scrivo l'usicta
-				spif_n16(0xE001);
-				break;
-			} 
-		
-			if (dataIN & ARRESTO_STOP)
-			{
-				// DISP (PL(_P),PN(0),PN(0),PN(1));	
-				statoMacchina = ST_ALARM_2;
-				dataOUT = LUCE_GIALLA; //accendo solo la luce gialla del lampeggiante
-				I_O_EXCH(dataOUT);	// leggo anche i tasti
-				spif_n16(0xE002);
-				break;
-			} 
-			
-			if (dataIN & MARCIA_START)
-			{	
-				DISP (PL(_S),PL(_T),PL(_R),PL(_T));	
-				statoMacchina = ST_START;
-				dataOUT = LUCE_VERDE; //si parte, luce verde
-				I_O_EXCH(dataOUT);	// leggo anche i tasti
-				spif_n16(0x5001);
-				break;
-			} else {
-				// sto fermo qua in attesa
-				
-			} 	
 		}
 		break;
 		
 		case ST_ALARM_1:
 		{
 			// sto qua fin che muoio per il momento
-			DISP (PL(_E),PL(_R),PL(_R),PN(ERROR_1));			
-			statoErrore = ERROR_1;
-			
-			// ora devo testare cosa: l'uinterruttore che si apra: quale: 
-			dataOUT = LUCE_ROSSA; //accendo solo la luce rossa del lampeggiante
+
 			dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
+			
+			// spif_n16(dataIN);
+			// spif_n16(0xEE01);
+			
 			if(dataIN & SWITCH_RESET) {
 				// esco da qua premendo un reset.
+				DISP (PL(_I),PL(_D),PL(_L),PL(_E));
 				statoMacchina	= ST_IDLE;
 				break;
 			} else {
@@ -440,19 +479,23 @@ void MainProgram(void)
 		break;
 		
 		
-		case ST_ALARM_2:
+		case ST_ARRESTO:
 		{
 			// sto qua fin che muoio per il momento
-			DISP (PL(_E),PL(_R),PL(_R),PN(ERROR_2));			
-			statoErrore = ERROR_2;
-			
-			// ora devo testare cosa: l'uinterruttore che si apra: quale: 
-			dataOUT = LUCE_GIALLA; //accendo solo la luce rossa del lampeggiante
+
 			dataIN = I_O_EXCH(dataOUT);	// leggo anche i tasti
+			
+			// spif_n16(dataIN);
+			// spif_n16(0xEE02);
+			
 			if(dataIN & SWITCH_RESET) {
 				// esco da qua premendo un reset.
+				DISP (PL(_I),PL(_D),PL(_L),PL(_E));
 				statoMacchina	= ST_IDLE;
-			}	
+				break;
+			} else {
+				// resto qua in attesa;
+			}		
 		}	
 		break;
 		
@@ -462,16 +505,12 @@ void MainProgram(void)
 			statoErrore = NO_ERROR; // tenere o buttare l'ultimo errore
 			provenienza = ST_START;
 			// ciclo qua dentro ogni ms
-			
-			
-			
-			
-			
+			spif_n8(testSeq);
 			DISP (PN(testSeq),PN(testSeq),PN(testSeq),PN(testSeq));	
-			wait = 500;	// prima di tornare qua aspetto un tempo "wait"
+			wait = 1000;	// prima di tornare qua aspetto un tempo "wait"
 			testSeq++;
 			testSeq &= 7; //  si ferma a 7
-			spif_n8(testSeq);
+			// spif_n8(testSeq);
 			if (testSeq == 8)  {
 				// quando arrivza a 8 va in allarme
 				// provenienza = ST_ALARM_1; 
