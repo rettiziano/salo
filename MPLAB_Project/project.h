@@ -30,9 +30,6 @@
 
 /************************************************************************************/
 
-#define FIRST_POSITION 0 
-#define LAST_POSITION 7.
-	
 /************************************************************************************/
 // #define PIN_SPIF PIN_A4
 /************************************************************************************/
@@ -55,35 +52,21 @@
 // #bit	PARLA_ASCOLTA = 0xF82.5 //PORTC.5 rxtx
 // #bit	PARLA_ASCOLTA = 0xF82.5 //PORTC.5 rxtx
 /************************************************************************************/
-#define DISPLAY_0 0b11111100  // visualizza sul diplay 0
-#define DISPLAY_1 0b01100000  // visualizza sul diplay 1
-#define DISPLAY_2 0b11011010  // visualizza sul diplay 2
-#define DISPLAY_3 0b11110010  // visualizza sul diplay 3
-#define DISPLAY_4 0b01100110  // visualizza sul diplay 4
-#define DISPLAY_5 0b10110110  // visualizza sul diplay 5
-#define DISPLAY_6 0b00111110  // visualizza sul diplay 6
-#define DISPLAY_7 0b11100000  // visualizza sul diplay 7
-#define DISPLAY_8 0b11111110  // visualizza sul diplay 8
-#define DISPLAY_9 0b11100110  // visualizza sul diplay 9
+#define D_0 0b11111100  // visualizza sul diplay 0
+#define D_1 0b01100000  // visualizza sul diplay 1
+#define D_2 0b11011010  // visualizza sul diplay 2
+#define D_3 0b11110010  // visualizza sul diplay 3
+#define D_4 0b01100110  // visualizza sul diplay 4
+#define D_5 0b10110110  // visualizza sul diplay 5
+#define D_6 0b00111110  // visualizza sul diplay 6
+#define D_7 0b11100000  // visualizza sul diplay 7
+#define D_8 0b11111110  // visualizza sul diplay 8
+#define D_9 0b11100110  // visualizza sul diplay 9
+
+#define D_P 0b11001110  // visualizza sul diplay P
+#define D_E 0b10011110  // visualizza sul diplay E
 
 
-#define DISPLAY_A 0b11101110  // visualizza sul diplay A
-#define DISPLAY_B 0b00111110  // visualizza sul diplay B
-#define DISPLAY_C 0b10011100  // visualizza sul diplay C
-#define DISPLAY_D 0b01111010  // visualizza sul diplay D
-#define DISPLAY_E 0b10011110  // visualizza sul diplay E
-#define DISPLAY_F 0b10001110  // visualizza sul diplay F
-#define DISPLAY_P 0b11001110  // visualizza sul diplay P
-
-
-
-#define _A 0	// posizione in hex array di lettera
-#define _B 1	// posizione in hex array di lettera
-#define _C 2	// posizione in hex array di lettera
-#define _D 3	// posizione in hex array di lettera
-#define _E 4	// posizione in hex array di lettera
-#define _F 5	// posizione in hex array di lettera
-#define _P 6	// posizione in hex array di lettera
 
 
 

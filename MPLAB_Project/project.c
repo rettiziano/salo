@@ -23,8 +23,6 @@ volatile unsigned int8 flag_1s = 0;
 #define	DIVISORE_SECONDI 1000
 
 unsigned int16 I_O_EXCH(unsigned int16 output_data);
-unsigned int8 scriviLettera(unsigned int8 lettera);
-unsigned int8 scriviNumero(unsigned int8 numero);
 
 /****************************************************************************************\
 void coilOutput(void)		// reimposta le uscite digitali
@@ -49,30 +47,6 @@ void coilReset(void)		// resetta le uscite digitali
 	outputStatus = 0;
 }
 \******************************************************************************************/
-
-
-static const unsigned int8 numeri[] = {
-	DISPLAY_0, // visualizza sul diplay 0
-	DISPLAY_1, // visualizza sul diplay 1
-	DISPLAY_2, // visualizza sul diplay 2
-	DISPLAY_3, // visualizza sul diplay 3
-	DISPLAY_4, // visualizza sul diplay 4
-	DISPLAY_5, // visualizza sul diplay 5
-	DISPLAY_6, // visualizza sul diplay 6
-	DISPLAY_7, // visualizza sul diplay 7
-	DISPLAY_8, // visualizza sul diplay 8
-	DISPLAY_9, // visualizza sul diplay 9
-};
-
-static const unsigned int8 lettere[] = {
-	DISPLAY_A, // visualizza sul diplay A
-	DISPLAY_B, // visualizza sul diplay B
-	DISPLAY_C, // visualizza sul diplay C
-	DISPLAY_D, // visualizza sul diplay D
-	DISPLAY_E, // visualizza sul diplay E
-	DISPLAY_F, // visualizza sul diplay F
-	DISPLAY_P  // visualizza sul diplay P
-};
 
 #INT_TIMER0
 void timer0_isr()
@@ -120,7 +94,10 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	unsigned int16 input_data = 0;
 //	unsigned int8 position;	// importante partire dall'ultima posizione
 
-
+	#define FIRST_POSITION 0 
+	#define LAST_POSITION 15
+	
+			
 	output_low(PIN_SER_PAR);	// leggo l'ingresso d hc165
 	delay_us(10); // aspetta
 	output_high(PIN_SER_PAR);
@@ -161,16 +138,16 @@ unsigned int16 I_O_EXCH(unsigned int16 output_data)
 	return input_data;
 	
 }
-/////////////////////////////////////////////////////////////
+
 unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 {
 	unsigned int8 i;
 
-			
+	#define FIRST_POSITION 0 
+	#define LAST_POSITION 7
+	
 	output_low(PIN_A2);		// abilito il display
 	delay_us(10); 			// aspetta
-	
-
 	
 	output_high(PIN_A1);		// clock salita display 33
 	delay_us(10); 			// aspetta
@@ -203,7 +180,6 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_bit (PIN_A0, ((out_disp_1 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
 		delay_us(10); // aspetta
 		
-		
 		out_disp_1 <<= 1;	// RoL Circular rotation left
 		delay_us(10); 		// aspetta
 		
@@ -219,7 +195,6 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_bit (PIN_A0, ((out_disp_2 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
 		delay_us(10); // aspetta
 		
-		
 		out_disp_2 <<= 1;	// RoL Circular rotation left
 		delay_us(10); 		// aspetta
 		
@@ -233,7 +208,6 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		// output_bit (PIN, val); assegna val a PIN
 		output_bit (PIN_A0, ((out_disp_3 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
 		delay_us(10); // aspetta
-		
 		
 		out_disp_3 <<= 1;	// RoL Circular rotation left
 		delay_us(10); 		// aspetta
@@ -250,7 +224,6 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		output_bit (PIN_A0, ((out_disp_4 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
 		delay_us(10); // aspetta
 		
-		
 		out_disp_4 <<= 1;	// RoL Circular rotation left
 		delay_us(10); 		// aspetta
 		
@@ -258,25 +231,24 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 		delay_us(10); 		// aspetta
 		output_low(PIN_A1);	// clock discesa display			
 	}
-
-
-	
-	
-	
 	
 	output_high(PIN_A2);	// disabilito il display
-	
 
-	return 0;
+	return ;
 	
 }
-/////////////////////////////////////////////////////////////
+
 
 
 void main()
-{//////////////////////////////  main ////////////////////	
+/////////////////////////////////////////////////////////////
+//////////////////////////////  main ///////////////////////
+/////////////////////////////////////////////////////////////
+{	
 	unsigned int16 dataIN = 0, dataOUT = 0;
 	unsigned int16 retVal = 0;
+	
+	int8 stat = 0;	
 	
 	#use fast_io(A)
 	#use fast_io(B)
@@ -313,37 +285,79 @@ void main()
 		// if(flag_100ms) 
 		{ // sono passati 100ms
 			flag_100ms = 0;
-			data = 0b0000000000000001;
+//			data = 0b0000000000000001;
 //			dataIN = I_O_EXCH(0b0101010101010101);
-			dataIN = I_O_EXCH(dataIN);
+//			dataIN = I_O_EXCH(dataIN);
 //			spif_n16(data);	
-			spif_n16(dataIN);
+//			spif_n16(dataIN);
 //			data = 0x00ff;			
 			
 //			data <<=1;
-//////////////////////////////////////////////
-		DISP (scriviLettera(_P),scriviNumero(0),scriviNumero(1),scriviNumero(2));
-		
-			
-//////////////////////////////////////////////			
+
+//			DISP (D_P,D_0,D_1,D_2,);
+				
 		}
 
 		if(flag_1ms) { // e' passato 1ms
 			flag_1ms = 0;
+		}// main loop
+		
+	//--------------------------------------------------------
+	dataIN = I_O_EXCH(dataOUT);
+//	spif_n16(dataIN);
+	switch(stat) //cicla tra un case e l'altro in funzione dello stato di avanzamento
+	{
+	case 0x00:	// passo 0 qui dentro ciclo quando c'e' un arresto macchina 
+
+		dataIN = I_O_EXCH(dataOUT);
+		if ((dataIN & 0b0000000000000010) > 1)
+		{
+			DISP (D_P,D_0,D_0,D_0,);			
+			stat = 1;
+			dataOUT = 0b0000000000000010; //accendo solo la luce rossa del lampeggiante
+		} 
+//		break;
+		
+	case 0x01:	// passo 1 qui rimango fino quando arriva lo start 
+
+		dataIN = I_O_EXCH(dataOUT);
+		if ((dataIN & 0b0000000000000001) > 1)
+		{
+			DISP (D_P,D_0,D_0,D_1,);
+			stat = 3;
+			dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
+		} 
+		else 
+		{ 
+		stat = 1;
 		}
-
-	}// main loop
+//		break;
+		
+	case 0x02:	// passo 2 qui dentro resetto il ciclo della macchina 
+		dataIN = I_O_EXCH(dataOUT);
+		if ((dataIN & 0b0000000000000100) > 1)
+		{
+			DISP (D_P,D_0,D_0,D_2,);
+			stat = 2;
+			dataOUT = 0b0000000000001000; //accendo solo la luce gialla del lampeggiante
+		} 
+		else 
+		{ 
+		stat = 0;
+		}		
+		
+	case 0x03:
+	
+		stat = 0;
+		break;
+		
+	default:
+	
+		stat = 0;
+		break;
+	}
+	
+		
+	//--------------------------------------------------------
+	}
 }//////////////////////////////  main ////////////////////	
-
-
-
-unsigned int8 scriviLettera(unsigned int8 lettera)
-{
-	return 	lettere[lettera];
-}	
-
-
-unsigned int8 scriviNumero(unsigned int8 numero)
-{
-	return 	numeri[numero];
-}	
