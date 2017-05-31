@@ -390,7 +390,10 @@ void MainProgram(void)
 	{	
 		// DISP (PL(_P),PN(0),PN(0),PN(0));			
 		statoMacchina = ST_ALARM_1;
-		dataOUT = LUCE_ROSSA; //accendo solo la luce ROSSA del lampeggiante
+		dataOUT |= LUCE_ROSSA; //accendo solo la luce ROSSA del lampeggiante
+		dataOUT &= ~LUCE_GIALLA;
+		dataOUT &= ~LUCE_VERDE;
+		
 		I_O_EXCH(dataOUT);	// scrivo l'usicta
 		// spif_n16(dataIN);
 		spif_n16(0xE001);
@@ -407,6 +410,9 @@ void MainProgram(void)
 			// spif_n8(provenienza);
 			statoMacchina = ST_ARRESTO;
 			dataOUT |= LUCE_GIALLA; //accendo in piu la luce gialla del lampeggiante
+			dataOUT &= ~LUCE_VERDE;
+			dataOUT &= ~LUCE_ROSSA;
+			
 			I_O_EXCH(dataOUT);	// leggo anche i tasti
 			// spif_n16(dataIN);
 			spif_n16(0xE002);
@@ -437,7 +443,9 @@ void MainProgram(void)
 			statoMacchina = ST_START;
 			DISP (PL(_S),PL(_T),PL(_R),PL(_T));	
 			statoMacchina = ST_START;
-			dataOUT = LUCE_VERDE; //si parte, luce verde
+			dataOUT |= LUCE_VERDE; //si parte, luce verde
+			dataOUT &= ~LUCE_GIALLA;
+			dataOUT &= ~LUCE_ROSSA;
 			I_O_EXCH(dataOUT);	// leggo anche i tasti
 			// spif_n16(dataIN);
 			spif_n16(0x5001);
