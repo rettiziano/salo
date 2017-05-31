@@ -289,8 +289,8 @@ void main()
 	enable_interrupts(GLOBAL);
 	enable_interrupts(INT_TIMER0);
 	
-	// DISP (DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF,DISPLAY_OFF);
-	DISP (PL(_I),PL(_D),PL(_L),PL(_E));
+	DISP (DISPLAY_A,DISPLAY_B,DISPLAY_C,DISPLAY_D);
+	// DISP (PL(_I),PL(_D),PL(_L),PL(_E));
 	delay_ms(2000);
 	
 	for(;;)
