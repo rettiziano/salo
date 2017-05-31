@@ -93,16 +93,22 @@
 // #bit	PARLA_ASCOLTA = 0xF82.5 //PORTC.5 rxtx
 /************************************************************************************/
 // questi sono invertiti, andrebbe ruotato tutto
-#define DISPLAY_0 0b11111100  // visualizza sul diplay 0
-#define DISPLAY_1 0b01100000  // visualizza sul diplay 1
-#define DISPLAY_2 0b11011010  // visualizza sul diplay 2
-#define DISPLAY_3 0b11110010  // visualizza sul diplay 3
-#define DISPLAY_4 0b01100110  // visualizza sul diplay 4
-#define DISPLAY_5 0b10110110  // visualizza sul diplay 5
-#define DISPLAY_6 0b00111110  // visualizza sul diplay 6
-#define DISPLAY_7 0b11100000  // visualizza sul diplay 7
-#define DISPLAY_8 0b11111110  // visualizza sul diplay 8
-#define DISPLAY_9 0b11100110  // visualizza sul diplay 9
+#define DISPLAY_n0 0b11111100  // visualizza sul diplay 0
+#define DISPLAY_n1 0b01100000  // visualizza sul diplay 1
+#define DISPLAY_n2 0b11011010  // visualizza sul diplay 2
+#define DISPLAY_n3 0b11110010  // visualizza sul diplay 3
+#define DISPLAY_n4 0b01100110  // visualizza sul diplay 4
+#define DISPLAY_n5 0b10110110  // visualizza sul diplay 5
+#define DISPLAY_n6 0b00111110  // visualizza sul diplay 6
+#define DISPLAY_n7 0b11100000  // visualizza sul diplay 7
+#define DISPLAY_n8 0b11111110  // visualizza sul diplay 8
+#define DISPLAY_n9 0b11100110  // visualizza sul diplay 9
+#define DISPLAY_nA 0b11101110  // visualizza sul diplay A
+#define DISPLAY_nB 0b00111110  // visualizza sul diplay B
+#define DISPLAY_nC 0b10011100  // visualizza sul diplay C
+#define DISPLAY_nD 0b01111010  // visualizza sul diplay D
+#define DISPLAY_nE 0b10011110  // visualizza sul diplay E
+#define DISPLAY_nF 0b10001110  // visualizza sul diplay F
 
 
 #define DISPLAY_A 0b11101110  // visualizza sul diplay A

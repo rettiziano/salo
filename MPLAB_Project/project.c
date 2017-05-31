@@ -57,16 +57,22 @@ void coilReset(void)		// resetta le uscite digitali
 
 
 static const unsigned int8 numeri[] = {
-	DISPLAY_0, // visualizza sul diplay 0
-	DISPLAY_1, // visualizza sul diplay 1
-	DISPLAY_2, // visualizza sul diplay 2
-	DISPLAY_3, // visualizza sul diplay 3
-	DISPLAY_4, // visualizza sul diplay 4
-	DISPLAY_5, // visualizza sul diplay 5
-	DISPLAY_6, // visualizza sul diplay 6
-	DISPLAY_7, // visualizza sul diplay 7
-	DISPLAY_8, // visualizza sul diplay 8
-	DISPLAY_9, // visualizza sul diplay 9
+	DISPLAY_n0, // visualizza sul diplay 0
+	DISPLAY_n1, // visualizza sul diplay 1
+	DISPLAY_n2, // visualizza sul diplay 2
+	DISPLAY_n3, // visualizza sul diplay 3
+	DISPLAY_n4, // visualizza sul diplay 4
+	DISPLAY_n5, // visualizza sul diplay 5
+	DISPLAY_n6, // visualizza sul diplay 6
+	DISPLAY_n7, // visualizza sul diplay 7
+	DISPLAY_n8, // visualizza sul diplay 8
+	DISPLAY_n9, // visualizza sul diplay 9
+	DISPLAY_nA, // visualizza sul diplay A
+	DISPLAY_nB, // visualizza sul diplay B
+	DISPLAY_nC, // visualizza sul diplay C
+	DISPLAY_nD, // visualizza sul diplay D
+	DISPLAY_nE, // visualizza sul diplay E
+	DISPLAY_nF, // visualizza sul diplay F
 };
 
 static const unsigned int8 lettere[] = {
@@ -192,12 +198,13 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 			
 	// spif_n8(0xd0);	
 	//reset LOW
-	CLOCK_LOW;
-	DISPLAY_ENABLE;
-	DATA_HIGH;				// start bit
-	delay_us(10); 			// aspetta
+	CLOCK_LOW;				// clock basso
+	DISPLAY_ENABLE;			// abilitazione del buffer di ingresso dei dati
+	DATA_HIGH;				// start bit	-> prepara alto
+	delay_us(10); 			// aspetta		
+	
 	CLOCK_HIGH;				// posizione 1 cc 1
-	CLOCK_LOW;
+	CLOCK_LOW;				// carica lo start
 
 	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
@@ -254,8 +261,7 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 	CLOCK_LOW;
 	//internal reset LOW
 
-	output_high(PIN_A2);	// disabilito il display
-	
+	DISPLAY_DISABLE;	// disabilito il display
 
 	return 0;
 	
@@ -499,8 +505,9 @@ void MainProgram(void)
 			DISP (PN(testSeq),PN(testSeq),PN(testSeq),PN(testSeq));	
 			wait = 1000;	// prima di tornare qua aspetto un tempo "wait"
 			testSeq++;
-			testSeq &= 7; //  si ferma a 7
-			// spif_n8(testSeq);
+			testSeq &= 0x0F;
+
+
 			if (testSeq == 8)  {
 				// quando arrivza a 8 va in allarme
 				// provenienza = ST_ALARM_1; 
