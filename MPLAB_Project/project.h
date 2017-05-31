@@ -92,6 +92,7 @@
 // #bit	PARLA_ASCOLTA = 0xF82.5 //PORTC.5 rxtx
 // #bit	PARLA_ASCOLTA = 0xF82.5 //PORTC.5 rxtx
 /************************************************************************************/
+// questi sono invertiti, andrebbe ruotato tutto
 #define DISPLAY_0 0b11111100  // visualizza sul diplay 0
 #define DISPLAY_1 0b01100000  // visualizza sul diplay 1
 #define DISPLAY_2 0b11011010  // visualizza sul diplay 2

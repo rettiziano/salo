@@ -177,100 +177,82 @@ unsigned int8 DISP(unsigned int8 out_disp_1, out_disp_2, out_disp_3, out_disp_4)
 {
 	unsigned int8 i;
     static const unsigned int8 lastPosition = 7;
-		
+    
+    #define CLOCK_HIGH 		output_high(PIN_A1);\
+    							delay_us(10) 			// clock high, aspetta
+    							
+    #define CLOCK_LOW 		output_low(PIN_A1);\
+    							delay_us(10) 			// clock low, aspetta
+    
+    #define DATA_HIGH		output_high(PIN_A0);
+    #define DATA_LOW		output_low(PIN_A0);
+    
+    #define DISPLAY_ENABLE	output_low(PIN_A2);		// abilito il display
+	#define DISPLAY_DISABLE	output_high(PIN_A2);		// abilito il display
+			
 	// spif_n8(0xd0);	
-	output_low(PIN_A2);		// abilito il display
+	//reset LOW
+	CLOCK_LOW;
+	DISPLAY_ENABLE;
+	DATA_HIGH;				// start bit
 	delay_us(10); 			// aspetta
-	
-
-	output_high(PIN_A1);	// clock salita display 33
-	delay_us(10); 			// aspetta
-	output_low(PIN_A1);		// clock discesa display
-	delay_us(10); 			// aspetta
-	output_high(PIN_A1);	// clock salita display 34
-	delay_us(10); 			// aspetta
-	output_low(PIN_A1);		// clock discesa display
-	delay_us(10);			// aspetta
-	output_high(PIN_A1);	// clock salita display 35
-	delay_us(10); 			// aspetta
-	output_low(PIN_A1);		// clock discesa display 
-	delay_us(10);			// aspetta
-	
-	output_high(PIN_A0);		// do due colpi di clock con il bit dati a uno
-	delay_us(10); 			// aspetta
-		
-	output_high(PIN_A1);		// clock salita display 36
-	delay_us(10); 			// aspetta
-	output_low(PIN_A1);		// clock discesa display
-	delay_us(10);			// aspetta
-	
-	output_low(PIN_A0);		// fine ciclo due colpi di clock
-	delay_us(10); 			// aspetta		
+	CLOCK_HIGH;				// posizione 1 cc 1
+	CLOCK_LOW;
 
 	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
-		
 		// output_bit (PIN, val); assegna val a PIN
 		output_bit (PIN_A0, ((out_disp_1 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
-		delay_us(10); // aspetta
-		
-		
 		out_disp_1 <<= 1;	// RoL Circular rotation left
-		delay_us(10); 		// aspetta
 		
-		output_high(PIN_A1);	// clock salita display
-		delay_us(10); 		// aspetta
-		output_low(PIN_A1);	// clock discesa display			
-	}
+		CLOCK_HIGH;
+		CLOCK_LOW;			
+	} // cc 9
 	
 	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
-		
 		// output_bit (PIN, val); assegna val a PIN
 		output_bit (PIN_A0, ((out_disp_2 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
-		delay_us(10); // aspetta
-		
-		
 		out_disp_2 <<= 1;	// RoL Circular rotation left
-		delay_us(10); 		// aspetta
-		
-		output_high(PIN_A1);	// clock salita display
-		delay_us(10); 		// aspetta
-		output_low(PIN_A1);	// clock discesa display			
-	}
+
+		CLOCK_HIGH;
+		CLOCK_LOW;			
+	} // cc 17
 	
 	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
-		
 		// output_bit (PIN, val); assegna val a PIN
 		output_bit (PIN_A0, ((out_disp_3 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
-		delay_us(10); // aspetta
-		
-		
 		out_disp_3 <<= 1;	// RoL Circular rotation left
-		delay_us(10); 		// aspetta
-		
-		output_high(PIN_A1);	// clock salita display
-		delay_us(10); 		// aspetta
-		output_low(PIN_A1);	// clock discesa display			
-	}
+
+		CLOCK_HIGH;
+		CLOCK_LOW;	
+	} // cc 25
 	
 	for(i=0; i<=lastPosition;i++) 
 	{// scrive 8 bit sullo shift register del display
-		
 		// output_bit (PIN, val); assegna val a PIN
 		output_bit (PIN_A0, ((out_disp_4 & BIT7) != 0)); // scrive il valore dell'ultimo bit sul pin di uscita
-		delay_us(10); // aspetta
-		
-		
 		out_disp_4 <<= 1;	// RoL Circular rotation left
-		delay_us(10); 		// aspetta
 		
-		output_high(PIN_A1);	// clock salita display
-		delay_us(10); 		// aspetta
-		output_low(PIN_A1);	// clock discesa display			
-	}
+		CLOCK_HIGH;
+		CLOCK_LOW;	
+	} // cc 33
 
+	// led 1 cc 34 
+	CLOCK_HIGH;
+	CLOCK_LOW;
+
+	// led 2 cc 35
+	CLOCK_HIGH;
+	CLOCK_LOW;
+	
+	// cc 36
+	// internal LOAD
+	CLOCK_HIGH;
+	// internal reset HIGH
+	CLOCK_LOW;
+	//internal reset LOW
 
 	output_high(PIN_A2);	// disabilito il display
 	
